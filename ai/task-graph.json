@@ -1,0 +1,288 @@
+{
+  "feature": "StoryForge — blogging platform",
+  "generated": "2026-03-14",
+  "generator": "/cortex-blueprint v1.0",
+  "totalNodes": 28,
+  "nodes": [
+    {
+      "id": "p0-scaffold",
+      "phase": 0,
+      "label": "NestJS scaffold + Prisma setup",
+      "type": "scaffold",
+      "status": "done",
+      "dependsOn": [],
+      "skill": "/cert-scaffold",
+      "completedAt": "2026-03-14"
+    },
+    {
+      "id": "p0-health",
+      "phase": 0,
+      "label": "Health check endpoint GET /api/health",
+      "type": "endpoint",
+      "status": "done",
+      "dependsOn": ["p0-scaffold"],
+      "skill": "/dev-backend-endpoint",
+      "completedAt": "2026-03-14"
+    },
+    {
+      "id": "p1-schema-users",
+      "phase": 1,
+      "label": "Prisma schema — User · RefreshToken · Follow",
+      "type": "schema",
+      "status": "done",
+      "dependsOn": ["p0-scaffold"],
+      "skill": "/dev-backend-schema",
+      "completedAt": "2026-03-14"
+    },
+    {
+      "id": "p1-auth",
+      "phase": 1,
+      "label": "Auth module — register · login · refresh · logout · JWT · RolesGuard",
+      "type": "endpoint",
+      "status": "done",
+      "dependsOn": ["p1-schema-users"],
+      "skill": "/dev-backend-auth",
+      "completedAt": "2026-03-14"
+    },
+    {
+      "id": "p1-users",
+      "phase": 1,
+      "label": "Users module — profile CRUD · avatar upload · follow/unfollow",
+      "type": "endpoint",
+      "status": "blocked",
+      "dependsOn": ["p1-auth"],
+      "skill": "/dev-backend-endpoint"
+    },
+    {
+      "id": "p1-tests",
+      "phase": 1,
+      "label": "Tests — AuthService · UsersService",
+      "type": "test",
+      "status": "blocked",
+      "dependsOn": ["p1-auth", "p1-users"],
+      "skill": "/dev-backend-test"
+    },
+    {
+      "id": "p2-schema-content",
+      "phase": 2,
+      "label": "Prisma schema — Article · Revision · Tag · ArticleTag",
+      "type": "schema",
+      "status": "done",
+      "dependsOn": ["p1-schema-users"],
+      "skill": "/dev-backend-schema",
+      "completedAt": "2026-03-14"
+    },
+    {
+      "id": "p2-articles",
+      "phase": 2,
+      "label": "Articles module — CRUD + state machine + slug lock",
+      "type": "endpoint",
+      "status": "blocked",
+      "dependsOn": ["p2-schema-content", "p1-auth"],
+      "skill": "/dev-backend-endpoint"
+    },
+    {
+      "id": "p2-revisions",
+      "phase": 2,
+      "label": "Revisions module — append-only saves + history endpoint",
+      "type": "endpoint",
+      "status": "blocked",
+      "dependsOn": ["p2-articles"],
+      "skill": "/dev-backend-endpoint"
+    },
+    {
+      "id": "p2-tags",
+      "phase": 2,
+      "label": "Tags module — CRUD + article tagging",
+      "type": "endpoint",
+      "status": "blocked",
+      "dependsOn": ["p2-schema-content"],
+      "skill": "/dev-backend-endpoint"
+    },
+    {
+      "id": "p2-tests",
+      "phase": 2,
+      "label": "Tests — ArticlesService · RevisionsService · TagsService",
+      "type": "test",
+      "status": "blocked",
+      "dependsOn": ["p2-articles", "p2-revisions", "p2-tags"],
+      "skill": "/dev-backend-test"
+    },
+    {
+      "id": "p3-schema-engagement",
+      "phase": 3,
+      "label": "Prisma schema — Clap · Comment",
+      "type": "schema",
+      "status": "done",
+      "dependsOn": ["p2-schema-content"],
+      "skill": "/dev-backend-schema",
+      "completedAt": "2026-03-14"
+    },
+    {
+      "id": "p3-comments",
+      "phase": 3,
+      "label": "Comments module — submit (PENDING) + moderation endpoints",
+      "type": "endpoint",
+      "status": "blocked",
+      "dependsOn": ["p3-schema-engagement", "p1-auth"],
+      "skill": "/dev-backend-endpoint"
+    },
+    {
+      "id": "p3-claps",
+      "phase": 3,
+      "label": "Claps module — append-only event + count query",
+      "type": "endpoint",
+      "status": "blocked",
+      "dependsOn": ["p3-schema-engagement", "p1-auth"],
+      "skill": "/dev-backend-endpoint"
+    },
+    {
+      "id": "p3-tests",
+      "phase": 3,
+      "label": "Tests — CommentsService · ClapsService",
+      "type": "test",
+      "status": "blocked",
+      "dependsOn": ["p3-comments", "p3-claps"],
+      "skill": "/dev-backend-test"
+    },
+    {
+      "id": "p4-feed",
+      "phase": 4,
+      "label": "Reader feed — articles by followed writers (paginated)",
+      "type": "endpoint",
+      "status": "blocked",
+      "dependsOn": ["p1-users", "p2-articles"],
+      "skill": "/dev-backend-endpoint"
+    },
+    {
+      "id": "p4-discovery",
+      "phase": 4,
+      "label": "Discovery — tag listing + public article listing (paginated)",
+      "type": "endpoint",
+      "status": "blocked",
+      "dependsOn": ["p2-tags", "p2-articles"],
+      "skill": "/dev-backend-endpoint"
+    },
+    {
+      "id": "p4-audit-log",
+      "phase": 4,
+      "label": "ArticleEvent audit log for status transitions",
+      "type": "schema",
+      "status": "blocked",
+      "dependsOn": ["p2-articles"],
+      "skill": "/dev-backend-schema"
+    },
+    {
+      "id": "p4-tests",
+      "phase": 4,
+      "label": "Tests — feed · discovery",
+      "type": "test",
+      "status": "blocked",
+      "dependsOn": ["p4-feed", "p4-discovery"],
+      "skill": "/dev-backend-test"
+    },
+    {
+      "id": "p5-schema-notifications",
+      "phase": 5,
+      "label": "Prisma schema — Notification (optional)",
+      "type": "schema",
+      "status": "blocked",
+      "dependsOn": ["p4-audit-log"],
+      "skill": "/dev-backend-schema"
+    },
+    {
+      "id": "p5-mailer",
+      "phase": 5,
+      "label": "MailerModule (BullMQ) — publish + comment-approved notifications",
+      "type": "endpoint",
+      "status": "blocked",
+      "dependsOn": ["p5-schema-notifications"],
+      "skill": "/dev-backend-queue"
+    },
+    {
+      "id": "p5-rate-limits",
+      "phase": 5,
+      "label": "Rate limiting — claps (50/min) + comments (10/hr)",
+      "type": "endpoint",
+      "status": "blocked",
+      "dependsOn": ["p3-claps", "p3-comments"],
+      "skill": "/dev-backend-endpoint"
+    },
+    {
+      "id": "p5-swagger",
+      "phase": 5,
+      "label": "Swagger docs — all modules",
+      "type": "docs",
+      "status": "blocked",
+      "dependsOn": ["p4-tests"],
+      "skill": "/cert-swagger"
+    },
+    {
+      "id": "verify-p1",
+      "phase": 1,
+      "label": "cert-verify — Phase 1",
+      "type": "verify",
+      "status": "blocked",
+      "dependsOn": ["p1-tests"],
+      "skill": "/cert-verify"
+    },
+    {
+      "id": "verify-p2",
+      "phase": 2,
+      "label": "cert-verify — Phase 2",
+      "type": "verify",
+      "status": "blocked",
+      "dependsOn": ["p2-tests"],
+      "skill": "/cert-verify"
+    },
+    {
+      "id": "verify-p3",
+      "phase": 3,
+      "label": "cert-verify — Phase 3",
+      "type": "verify",
+      "status": "blocked",
+      "dependsOn": ["p3-tests"],
+      "skill": "/cert-verify"
+    },
+    {
+      "id": "verify-p4",
+      "phase": 4,
+      "label": "cert-verify — Phase 4",
+      "type": "verify",
+      "status": "blocked",
+      "dependsOn": ["p4-tests"],
+      "skill": "/cert-verify"
+    },
+    {
+      "id": "verify-p5",
+      "phase": 5,
+      "label": "cert-verify — Phase 5 (final)",
+      "type": "verify",
+      "status": "blocked",
+      "dependsOn": ["p5-mailer", "p5-rate-limits", "p5-swagger"],
+      "skill": "/cert-verify"
+    }
+  ],
+  "parallelGroups": [
+    {
+      "group": "Phase 0 ready now",
+      "nodes": ["p0-scaffold"]
+    },
+    {
+      "group": "Phase 2 — parallel after schema",
+      "nodes": ["p2-articles", "p2-tags"]
+    },
+    {
+      "group": "Phase 3 — parallel after engagement schema",
+      "nodes": ["p3-comments", "p3-claps"]
+    },
+    {
+      "group": "Phase 4 — parallel",
+      "nodes": ["p4-feed", "p4-discovery", "p4-audit-log"]
+    },
+    {
+      "group": "Phase 5 — parallel",
+      "nodes": ["p5-mailer", "p5-rate-limits", "p5-swagger"]
+    }
+  ]
+}

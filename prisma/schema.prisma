@@ -1,0 +1,189 @@
+// StoryForge — Prisma Schema
+// Phase 0: generator + datasource only
+// Phase 1+: models added per blueprint
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────
+// Phase 1 — Identity + Users
+// ─────────────────────────────────────────────────────────
+
+enum Role {
+  READER
+  WRITER
+  EDITOR
+  ADMIN
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(READER)
+  name         String
+  bio          String?
+  avatarUrl    String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  refreshTokens RefreshToken[]
+  articles      Article[]
+  comments      Comment[]
+  claps         Clap[]
+  following     Follow[]      @relation("follower")
+  followers     Follow[]      @relation("following")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
+  @@map("follows")
+}
+
+// ─────────────────────────────────────────────────────────
+// Phase 2 — Content Core
+// ─────────────────────────────────────────────────────────
+
+enum ArticleStatus {
+  DRAFT
+  SUBMITTED
+  PUBLISHED
+  ARCHIVED
+}
+
+model Article {
+  id            String        @id @default(cuid())
+  authorId      String
+  slug          String        @unique
+  title         String
+  status        ArticleStatus @default(DRAFT)
+  publishedAt   DateTime?
+  coverImageUrl String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  author    User         @relation(fields: [authorId], references: [id])
+  revisions Revision[]
+  comments  Comment[]
+  claps     Clap[]
+  tags      ArticleTag[]
+
+  @@index([authorId])
+  @@index([status])
+  @@map("articles")
+}
+
+model Revision {
+  id         String   @id @default(cuid())
+  articleId  String
+  content    String
+  editorNote String?
+  createdAt  DateTime @default(now())
+  // No updatedAt — revisions are immutable after creation
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId, createdAt])
+  @@map("revisions")
+}
+
+// ─────────────────────────────────────────────────────────
+// Phase 2 — Taxonomy
+// ─────────────────────────────────────────────────────────
+
+model Tag {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  slug      String       @unique
+  createdAt DateTime     @default(now())
+
+  articles ArticleTag[]
+
+  @@map("tags")
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@map("article_tags")
+}
+
+// ─────────────────────────────────────────────────────────
+// Phase 3 — Engagement
+// ─────────────────────────────────────────────────────────
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Comment {
+  id        String        @id @default(cuid())
+  articleId String
+  authorId  String
+  body      String
+  status    CommentStatus @default(PENDING)
+  parentId  String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  article Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  author  User     @relation(fields: [authorId], references: [id])
+  parent  Comment? @relation("replies", fields: [parentId], references: [id])
+  replies Comment[] @relation("replies")
+
+  @@index([articleId, status])
+  @@map("comments")
+}
+
+model Clap {
+  id        String   @id @default(cuid())
+  articleId String
+  userId    String
+  createdAt DateTime @default(now())
+  // No updatedAt — claps are immutable append-only events
+  // Count at read time: SELECT COUNT(*) WHERE articleId = :id
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([articleId])
+  @@map("claps")
+}
