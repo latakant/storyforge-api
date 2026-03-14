@@ -1,7 +1,7 @@
 # StoryForge — Project Status
 > Last updated: 2026-03-14
 
-## Score: 100/100 — ALLOW (new project, no debt)
+## Score: N/A — ALLOW (new project — run /cert-verify after first code to establish baseline)
 
 ## Decision: ALLOW — all work permitted
 
