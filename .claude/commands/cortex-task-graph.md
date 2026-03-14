@@ -30,6 +30,8 @@ Parse from $ARGUMENTS:
 - `generate` — generate graph from current ai/blueprint.md (called by blueprint Phase 7.5)
 - `feature "<description>"` — generate graph for a specific feature (not full project)
 - `status` — show current graph progress (what's done, in progress, pending, blocked)
+- `status --graph` — status + ASCII dependency diagram
+- `visualize` — render full ASCII dependency diagram from ai/task-graph.json
 - `next` — show which tasks can run right now (all dependencies met)
 - `reset` — mark all nodes pending (restart the feature)
 - `--output <path>` — override default output path (default: ai/task-graph.json)
@@ -253,8 +255,9 @@ Progress: [████████░░░░░░░░░░░░] [N/Tota
   [node-id]  [name]  — reason: [blockedReason]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-To resume:  run the NEXT tasks above
+To resume:      run the NEXT tasks above
 To parallelize: open 2 sessions, each claims one NEXT task
+To visualize:   /cortex-task-graph visualize
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -306,6 +309,84 @@ Always update the `summary` counts after any status change.
 - `refund-service` + `order-state-service` in parallel (both just need schema)
 - `refund-endpoint` + `refund-webhook` in parallel (both need service)
 - `refund-test` + `refund-webhook-test` in parallel (final)
+
+---
+
+## STEP 4 — VISUALIZE MODE
+
+Triggered by: `visualize` or `status --graph`
+
+Read `ai/task-graph.json`. Build an ASCII dependency tree grouped by phases.
+
+### Rules for rendering
+
+1. Root nodes (no `dependsOn`) are top-level — render first
+2. Nodes sharing the same parent AND marked `parallelWith` each other → group with `├──` under a `[PARALLEL]` label
+3. Each node shows: `[type] name — status-icon`
+4. Status icons: `✓` done · `⏳` in_progress · `□` pending · `✗` blocked
+5. Max width: 60 chars per line — truncate name if needed
+6. Group by phase if blueprint phases are present in node IDs
+
+### Output format
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TASK DEPENDENCY GRAPH — [feature name]
+[N] nodes · [N] parallel groups · [N/N] done
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[schema] p0-scaffold                              ✓
+│
+├── [PARALLEL]
+│   ├── [schema]    auth-schema                   ✓
+│   └── [schema]    article-schema                ✓
+│       │
+│       ├── [PARALLEL]
+│       │   ├── [migration] article-migration     ⏳
+│       │   └── [service]   article-service       □
+│       │       │
+│       │       └── [endpoint] POST /articles     □
+│       │           │
+│       │           └── [PARALLEL]
+│       │               ├── [component] ArticleCard   □
+│       │               └── [service-fe] articleSvc   □
+│       │                   │
+│       │                   └── [page] /articles      □
+│       │
+│       └── [service] auth-service                □
+│           │
+│           └── [endpoint] POST /auth/login        □
+│
+└── [test] integration-tests                      □
+    (waiting for: all endpoints)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Legend: ✓ done  ⏳ active  □ pending  ✗ blocked
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### If graph is large (> 20 nodes)
+
+Collapse completed subtrees to keep output readable:
+
+```
+├── [PARALLEL — 4 nodes]  ✓ ALL DONE
+│   └── (collapsed — run /cortex-task-graph visualize --expand to see)
+```
+
+Show full tree only when `--expand` flag is passed.
+
+### After diagram — always show NEXT actions
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+READY TO RUN NOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ article-migration  → /dev-backend-schema migrate
+□ auth-service       → /dev-backend-auth
+(run in parallel — no dependencies between them)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
 
 ---
 
