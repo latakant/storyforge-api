@@ -49,6 +49,9 @@ const prismaMock = {
     findMany: jest.fn(),
     findFirst: jest.fn(),
   },
+  articleEvent: {
+    create: jest.fn(),
+  },
   $transaction: jest.fn(),
 };
 
@@ -59,6 +62,9 @@ describe('ArticlesService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+
+    // articleEvent.create always resolves (it's fire-and-forget inside transactions)
+    prismaMock.articleEvent.create.mockResolvedValue({ id: 'event-1' });
 
     // Handle both $transaction forms:
     //   callback form: $transaction(async (tx) => { ... tx.model.op() ... })
