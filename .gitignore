@@ -5,3 +5,10 @@ dist/
 build/
 *.log
 .DS_Store
+.cortex/
+.claude/settings.local.json
+ai/logs/cortex-execution.jsonl
+ai/logs/.trace
+web/.next/
+web/node_modules/
+web/.env.local

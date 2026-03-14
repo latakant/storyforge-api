@@ -12,6 +12,7 @@ import { CommentsModule } from './comments/comments.module';
 import { ClapsModule } from './claps/claps.module';
 import { DiscoveryModule } from './discovery/discovery.module';
 import { MailerModule } from './mailer/mailer.module';
+import { AdminModule } from './admin/admin.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { validateEnv } from './common/config/env.validation';
 
@@ -48,6 +49,7 @@ import { validateEnv } from './common/config/env.validation';
     ClapsModule,
     DiscoveryModule,
     MailerModule,
+    AdminModule,
   ],
 })
 export class AppModule implements NestModule {

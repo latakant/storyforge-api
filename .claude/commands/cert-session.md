@@ -274,6 +274,7 @@ Gaps        [list — or "none detected"]
 PROJECT STATE
 ─────────────────────────────────────────────────────────────
 Score         [X]/100  |  [ALLOW ≥95 | WATCH ≥85 | BLOCK <85]
+              [N/A = new project → ALLOW · run /cert-verify after first code]
 Blockers      [None — or list]
 Last session  [one-line from TRACKER.md]
 Layer issues  [N violations last 7 days · Most violated: [layer] — or "none"]
@@ -294,6 +295,8 @@ SCORE GATE
 [ALLOW]  ≥ 95 — all work permitted, new features included
 [WATCH]  ≥ 85 — bug fixes + tests only, no new features
 [BLOCK]  < 85 — no code changes until score recovers
+[N/A]    new project — ALLOW · no code yet to evaluate
+         First score established by /cert-verify after initial code
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 I know what I have. I know this project's laws. Ready.
@@ -331,11 +334,22 @@ START HERE — pick one:
 
 ## STEP 5 — LOG SESSION START
 
+Start a trace ID for this session — all lifecycle logs this session will be linked to it:
+
 ```bash
-node scripts/lifecycle.js log --action=INSIGHT --module=cortex \
-  --detail="SESSION_START v3.0: score=[X/100] decision=[ALLOW/BLOCK] \
+node scripts/lifecycle.js trace start
+```
+
+Then log the session start:
+
+```bash
+node scripts/lifecycle.js log --action=SESSION_START --module=cortex \
+  --detail="v3.0: score=[X/100] decision=[ALLOW/BLOCK] \
   skills=[N] agents=[N] adapters=[comma-list] instincts=[N] gaps=[list or none]"
 ```
+
+The trace ID is auto-read from `ai/logs/.trace` — no need to pass it manually.
+At session end (`/cert-end` or `/cert-commit`), call `node scripts/lifecycle.js trace end`.
 
 ---
 
@@ -346,10 +360,11 @@ node scripts/lifecycle.js log --action=INSIGHT --module=cortex \
 CORTEX — Session
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 STATUS  : READY
-Score   : [X]/100 · [ALLOW / WATCH / BLOCK]
+Score   : [X]/100 · [ALLOW / WATCH / BLOCK]  (N/A = new project → ALLOW)
 Skills  : [N] · Agents [N] · Adapters [N]
 Memory  : [N] graduated instincts · [N] pending
 Gaps    : [list or "none"]
+Trace   : [ctx-XXXXX]
 Logged  : SESSION_START · [date]
 Next    : /cortex-plan task "..." or /cortex-intent "..."
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

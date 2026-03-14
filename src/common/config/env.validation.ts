@@ -2,6 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import {
   IsEnum,
   IsNumber,
+  IsOptional,
   IsString,
   Min,
   Max,
@@ -34,6 +35,14 @@ class EnvironmentVariables {
 
   @IsString()
   CORS_ORIGINS: string = 'http://localhost:3000';
+
+  @IsOptional()
+  @IsString()
+  RESEND_API_KEY?: string;
+
+  @IsOptional()
+  @IsString()
+  MAIL_FROM?: string;
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {

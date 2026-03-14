@@ -34,6 +34,7 @@ Parse from $ARGUMENTS:
 - `visualize` — render full ASCII dependency diagram from ai/task-graph.json
 - `next` — show which tasks can run right now (all dependencies met)
 - `reset` — mark all nodes pending (restart the feature)
+- `critical-path` — show the longest dependency chain (if one node fails, feature stops)
 - `--output <path>` — override default output path (default: ai/task-graph.json)
 
 ---
@@ -386,6 +387,51 @@ READY TO RUN NOW
 □ auth-service       → /dev-backend-auth
 (run in parallel — no dependencies between them)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
+## STEP 5 — CRITICAL PATH
+
+Triggered by: `critical-path`
+
+Read `ai/task-graph.json`. Walk all dependency chains from root nodes (no `dependsOn`) to leaf
+nodes (nothing depends on them). Find the longest chain by node count.
+
+### Algorithm
+
+```
+1. Build adjacency map: node → nodes that depend on it
+2. DFS from each root node, tracking chain depth
+3. The longest path from any root to any leaf = critical path
+4. If a tie: pick the one containing most `service` or `endpoint` type nodes
+```
+
+### Output format
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRITICAL PATH — [feature name]
+[N] nodes · longest chain: [depth] steps
+If any node on this path fails → feature is blocked.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  [schema]    refund-schema         ✓  done
+       │
+  [migration] refund-migration      ⏳  in_progress
+       │
+  [service]   refund-service        □  pending
+       │
+  [endpoint]  POST /refunds         □  pending
+       │
+  [test]      refund-service-tests  □  pending
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARALLEL (not on critical path — safe to skip if blocked):
+  □ order-state-service   □ refund-webhook   □ refund-webhook-test
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Next on path: refund-service → /dev-backend-service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ---
