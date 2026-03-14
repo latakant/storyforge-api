@@ -28,6 +28,18 @@ const publicProfile = {
   _count: { followers: 5, following: 2 },
 };
 
+const mockFeedArticle = {
+  id: 'article-1',
+  slug: 'great-post',
+  title: 'Great Post',
+  publishedAt: new Date('2026-02-01'),
+  coverImageUrl: null,
+  authorId: 'followed-user-id',
+  createdAt: new Date('2026-02-01'),
+  updatedAt: new Date('2026-02-01'),
+  author: { id: 'followed-user-id', name: 'Bob' },
+};
+
 const prismaMock = {
   user: {
     findFirst: jest.fn(),
@@ -38,6 +50,11 @@ const prismaMock = {
     create: jest.fn(),
     count: jest.fn(),
     deleteMany: jest.fn(),
+    findMany: jest.fn(),
+  },
+  article: {
+    findMany: jest.fn(),
+    count: jest.fn(),
   },
 };
 
@@ -190,6 +207,44 @@ describe('UsersService', () => {
       prismaMock.follow.deleteMany.mockResolvedValue({ count: 0 });
 
       await expect(service.unfollow('follower-id', 'not-following-id')).resolves.not.toThrow();
+    });
+  });
+
+  // ── getFeed ─────────────────────────────────────────────────────────────────
+
+  describe('getFeed', () => {
+    it('returns paginated articles from followed writers', async () => {
+      prismaMock.follow.findMany.mockResolvedValue([{ followingId: 'followed-user-id' }]);
+      prismaMock.article.findMany.mockResolvedValue([mockFeedArticle]);
+      prismaMock.article.count.mockResolvedValue(1);
+
+      const result = await service.getFeed('user-1');
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0]).toMatchObject({ slug: 'great-post', author: { name: 'Bob' } });
+      expect(result.meta).toMatchObject({ total: 1, page: 1, limit: 20 });
+    });
+
+    it('returns empty feed when user follows nobody', async () => {
+      prismaMock.follow.findMany.mockResolvedValue([]);
+
+      const result = await service.getFeed('user-1');
+
+      expect(result.data).toEqual([]);
+      expect(result.meta.total).toBe(0);
+      expect(prismaMock.article.findMany).not.toHaveBeenCalled();
+    });
+
+    it('queries only PUBLISHED articles from followed authors', async () => {
+      prismaMock.follow.findMany.mockResolvedValue([{ followingId: 'author-id' }]);
+      prismaMock.article.findMany.mockResolvedValue([]);
+      prismaMock.article.count.mockResolvedValue(0);
+
+      await service.getFeed('user-1', 1, 20);
+
+      const whereArg = prismaMock.article.findMany.mock.calls[0][0].where;
+      expect(whereArg.authorId).toEqual({ in: ['author-id'] });
+      expect(whereArg.status).toBe('PUBLISHED');
     });
   });
 });

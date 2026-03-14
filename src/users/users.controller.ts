@@ -6,6 +6,7 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   HttpCode,
   HttpStatus,
   UseGuards,
@@ -54,5 +55,20 @@ export class UsersController {
     @Param('id') targetId: string,
   ): Promise<void> {
     await this.usersService.unfollow(user.id, targetId);
+  }
+
+  // AUTHENTICATED — personalized feed from followed writers
+  @Get('me/feed')
+  @UseGuards(JwtAuthGuard)
+  getFeed(
+    @CurrentUser() user: CurrentUserPayload,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.usersService.getFeed(
+      user.id,
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 20,
+    );
   }
 }

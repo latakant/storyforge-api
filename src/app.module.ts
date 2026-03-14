@@ -8,6 +8,7 @@ import { ArticlesModule } from './articles/articles.module';
 import { TagsModule } from './tags/tags.module';
 import { CommentsModule } from './comments/comments.module';
 import { ClapsModule } from './claps/claps.module';
+import { DiscoveryModule } from './discovery/discovery.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { validateEnv } from './common/config/env.validation';
 
@@ -25,7 +26,8 @@ import { validateEnv } from './common/config/env.validation';
     TagsModule,
     CommentsModule,
     ClapsModule,
-    // Phase 3+ modules continue below as built
+    DiscoveryModule,
+    // Phase 4+ modules continue below as built
   ],
 })
 export class AppModule implements NestModule {

@@ -34,12 +34,13 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  refreshTokens RefreshToken[]
-  articles      Article[]
-  comments      Comment[]
-  claps         Clap[]
-  following     Follow[]      @relation("follower")
-  followers     Follow[]      @relation("following")
+  refreshTokens  RefreshToken[]
+  articles       Article[]
+  comments       Comment[]
+  claps          Clap[]
+  articleEvents  ArticleEvent[]
+  following      Follow[]       @relation("follower")
+  followers      Follow[]       @relation("following")
 
   @@map("users")
 }
@@ -93,11 +94,12 @@ model Article {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  author    User         @relation(fields: [authorId], references: [id])
+  author    User           @relation(fields: [authorId], references: [id])
   revisions Revision[]
   comments  Comment[]
   claps     Clap[]
   tags      ArticleTag[]
+  events    ArticleEvent[]
 
   @@index([authorId])
   @@index([status])
@@ -186,4 +188,22 @@ model Clap {
 
   @@index([articleId])
   @@map("claps")
+}
+
+// Immutable audit log — one row per status transition, never updated or deleted
+model ArticleEvent {
+  id        String        @id @default(cuid())
+  articleId String
+  actorId   String
+  fromStatus ArticleStatus?
+  toStatus  ArticleStatus
+  note      String?       // editor rejection note, etc.
+  createdAt DateTime      @default(now())
+  // No updatedAt — audit events are immutable
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  actor   User    @relation(fields: [actorId], references: [id])
+
+  @@index([articleId])
+  @@map("article_events")
 }

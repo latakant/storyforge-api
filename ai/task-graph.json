@@ -156,27 +156,30 @@
       "phase": 4,
       "label": "Reader feed — articles by followed writers (paginated)",
       "type": "endpoint",
-      "status": "blocked",
+      "status": "done",
       "dependsOn": ["p1-users", "p2-articles"],
-      "skill": "/dev-backend-endpoint"
+      "skill": "/dev-backend-endpoint",
+      "completedAt": "2026-03-14"
     },
     {
       "id": "p4-discovery",
       "phase": 4,
       "label": "Discovery — tag listing + public article listing (paginated)",
       "type": "endpoint",
-      "status": "blocked",
+      "status": "done",
       "dependsOn": ["p2-tags", "p2-articles"],
-      "skill": "/dev-backend-endpoint"
+      "skill": "/dev-backend-endpoint",
+      "completedAt": "2026-03-14"
     },
     {
       "id": "p4-audit-log",
       "phase": 4,
       "label": "ArticleEvent audit log for status transitions",
       "type": "schema",
-      "status": "blocked",
+      "status": "done",
       "dependsOn": ["p2-articles"],
-      "skill": "/dev-backend-schema"
+      "skill": "/dev-backend-schema",
+      "completedAt": "2026-03-14"
     },
     {
       "id": "p4-tests",
