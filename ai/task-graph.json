@@ -49,9 +49,10 @@
       "phase": 1,
       "label": "Users module — profile CRUD · avatar upload · follow/unfollow",
       "type": "endpoint",
-      "status": "blocked",
+      "status": "done",
       "dependsOn": ["p1-auth"],
-      "skill": "/dev-backend-endpoint"
+      "skill": "/dev-backend-endpoint",
+      "completedAt": "2026-03-14"
     },
     {
       "id": "p1-tests",
@@ -77,27 +78,30 @@
       "phase": 2,
       "label": "Articles module — CRUD + state machine + slug lock",
       "type": "endpoint",
-      "status": "blocked",
+      "status": "done",
       "dependsOn": ["p2-schema-content", "p1-auth"],
-      "skill": "/dev-backend-endpoint"
+      "skill": "/dev-backend-endpoint",
+      "completedAt": "2026-03-14"
     },
     {
       "id": "p2-revisions",
       "phase": 2,
       "label": "Revisions module — append-only saves + history endpoint",
       "type": "endpoint",
-      "status": "blocked",
+      "status": "done",
       "dependsOn": ["p2-articles"],
-      "skill": "/dev-backend-endpoint"
+      "skill": "/dev-backend-endpoint",
+      "completedAt": "2026-03-14"
     },
     {
       "id": "p2-tags",
       "phase": 2,
       "label": "Tags module — CRUD + article tagging",
       "type": "endpoint",
-      "status": "blocked",
+      "status": "done",
       "dependsOn": ["p2-schema-content"],
-      "skill": "/dev-backend-endpoint"
+      "skill": "/dev-backend-endpoint",
+      "completedAt": "2026-03-14"
     },
     {
       "id": "p2-tests",
@@ -123,18 +127,20 @@
       "phase": 3,
       "label": "Comments module — submit (PENDING) + moderation endpoints",
       "type": "endpoint",
-      "status": "blocked",
+      "status": "done",
       "dependsOn": ["p3-schema-engagement", "p1-auth"],
-      "skill": "/dev-backend-endpoint"
+      "skill": "/dev-backend-endpoint",
+      "completedAt": "2026-03-14"
     },
     {
       "id": "p3-claps",
       "phase": 3,
       "label": "Claps module — append-only event + count query",
       "type": "endpoint",
-      "status": "blocked",
+      "status": "done",
       "dependsOn": ["p3-schema-engagement", "p1-auth"],
-      "skill": "/dev-backend-endpoint"
+      "skill": "/dev-backend-endpoint",
+      "completedAt": "2026-03-14"
     },
     {
       "id": "p3-tests",

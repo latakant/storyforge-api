@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HealthCheckService, PrismaHealthIndicator } from '@nestjs/terminus';
+import { HealthCheckService } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -21,14 +21,10 @@ describe('HealthController', () => {
           },
         },
         {
-          provide: PrismaHealthIndicator,
-          useValue: {
-            pingCheck: jest.fn().mockResolvedValue({ database: { status: 'up' } }),
-          },
-        },
-        {
           provide: PrismaService,
-          useValue: {},
+          useValue: {
+            $queryRaw: jest.fn().mockResolvedValue([{ 1: 1 }]),
+          },
         },
       ],
     }).compile();

@@ -30,13 +30,14 @@ const publicProfile = {
 
 const prismaMock = {
   user: {
+    findFirst: jest.fn(),
     findUnique: jest.fn(),
     update: jest.fn(),
   },
   follow: {
     create: jest.fn(),
+    count: jest.fn(),
     deleteMany: jest.fn(),
-    findUnique: jest.fn(),
   },
 };
 
@@ -62,11 +63,19 @@ describe('UsersService', () => {
 
   describe('getProfile', () => {
     it('returns public profile for existing username', async () => {
-      prismaMock.user.findUnique.mockResolvedValue(publicProfile);
+      prismaMock.user.findFirst.mockResolvedValue({
+        id: mockUser.id,
+        name: mockUser.name,
+        bio: mockUser.bio,
+        avatarUrl: mockUser.avatarUrl,
+        role: mockUser.role,
+        createdAt: mockUser.createdAt,
+      });
+      prismaMock.follow.count.mockResolvedValueOnce(5).mockResolvedValueOnce(2);
 
       const result = await service.getProfile('alice-writer');
 
-      expect(prismaMock.user.findUnique).toHaveBeenCalledWith(
+      expect(prismaMock.user.findFirst).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({ name: 'alice-writer' }),
         }),
@@ -74,6 +83,8 @@ describe('UsersService', () => {
       expect(result).toMatchObject({
         id: mockUser.id,
         name: mockUser.name,
+        followerCount: 5,
+        followingCount: 2,
       });
       // Must not expose sensitive fields
       expect(result).not.toHaveProperty('email');
@@ -81,7 +92,7 @@ describe('UsersService', () => {
     });
 
     it('throws NotFoundException for unknown username', async () => {
-      prismaMock.user.findUnique.mockResolvedValue(null);
+      prismaMock.user.findFirst.mockResolvedValue(null);
 
       await expect(service.getProfile('ghost')).rejects.toThrow(NotFoundException);
     });

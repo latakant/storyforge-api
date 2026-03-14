@@ -40,8 +40,10 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getProfile(username: string): Promise<PublicProfile> {
-    const user = await this.prisma.user.findUnique({
-      where: { name: username },
+    // name is not unique in schema — use findFirst; a unique `username` field
+    // should be added when slug-style usernames are introduced
+    const user = await this.prisma.user.findFirst({
+      where: { name: username, isActive: true },
       select: {
         id: true,
         name: true,
@@ -49,22 +51,17 @@ export class UsersService {
         avatarUrl: true,
         role: true,
         createdAt: true,
-        _count: { select: { followers: true, following: true } },
       },
     });
 
     if (!user) throw new NotFoundException(`User "${username}" not found`);
 
-    return {
-      id: user.id,
-      name: user.name,
-      bio: user.bio,
-      avatarUrl: user.avatarUrl,
-      role: user.role,
-      createdAt: user.createdAt,
-      followerCount: user._count.followers,
-      followingCount: user._count.following,
-    };
+    const [followerCount, followingCount] = await Promise.all([
+      this.prisma.follow.count({ where: { followingId: user.id } }),
+      this.prisma.follow.count({ where: { followerId: user.id } }),
+    ]);
+
+    return { ...user, followerCount, followingCount };
   }
 
   async updateProfile(userId: string, dto: UpdateProfileDto): Promise<PrivateProfile> {
@@ -95,7 +92,6 @@ export class UsersService {
       throw new BadRequestException('Cannot follow yourself');
     }
 
-    // Verify target user exists
     const target = await this.prisma.user.findUnique({
       where: { id: followingId },
       select: { id: true, isActive: true },
@@ -106,12 +102,10 @@ export class UsersService {
     }
 
     try {
-      const follow = await this.prisma.follow.create({
+      return await this.prisma.follow.create({
         data: { followerId, followingId },
         select: { followerId: true, followingId: true, createdAt: true },
       });
-
-      return follow;
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
         throw new ConflictException('Already following this user');
@@ -121,7 +115,6 @@ export class UsersService {
   }
 
   async unfollow(followerId: string, followingId: string): Promise<void> {
-    // Idempotent — deleteMany never throws if row missing
     await this.prisma.follow.deleteMany({
       where: { followerId, followingId },
     });

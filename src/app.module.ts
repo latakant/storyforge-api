@@ -4,6 +4,10 @@ import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { ArticlesModule } from './articles/articles.module';
+import { TagsModule } from './tags/tags.module';
+import { CommentsModule } from './comments/comments.module';
+import { ClapsModule } from './claps/claps.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { validateEnv } from './common/config/env.validation';
 
@@ -17,7 +21,11 @@ import { validateEnv } from './common/config/env.validation';
     HealthModule,
     AuthModule,
     UsersModule,
-    // Phase 2+ modules registered here as they are built
+    ArticlesModule,
+    TagsModule,
+    CommentsModule,
+    ClapsModule,
+    // Phase 3+ modules continue below as built
   ],
 })
 export class AppModule implements NestModule {
