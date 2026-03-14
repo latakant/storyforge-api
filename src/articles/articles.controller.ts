@@ -39,6 +39,13 @@ export class ArticlesController {
     return this.articlesService.create(dto, user.id);
   }
 
+  // AUTHENTICATED — own articles in all statuses
+  @Get('mine')
+  @UseGuards(JwtAuthGuard)
+  findMine(@CurrentUser() user: CurrentUserPayload) {
+    return this.articlesService.findMine(user.id);
+  }
+
   // PUBLIC
   @Get()
   findAll(@Query() query: ListArticlesDto) {

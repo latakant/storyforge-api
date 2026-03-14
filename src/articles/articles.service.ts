@@ -68,6 +68,18 @@ export interface PaginatedArticles {
 export class ArticlesService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findMine(authorId: string): Promise<ArticleSummary[]> {
+    return this.prisma.article.findMany({
+      where: { authorId },
+      orderBy: { updatedAt: 'desc' },
+      select: {
+        id: true, slug: true, title: true, status: true,
+        publishedAt: true, coverImageUrl: true, authorId: true,
+        createdAt: true, updatedAt: true,
+      },
+    });
+  }
+
   async create(dto: CreateArticleDto, authorId: string): Promise<ArticleSummary> {
     const slug = generateSlug(dto.title);
 
@@ -223,15 +235,20 @@ export class ArticlesService {
       throw new BadRequestException('Cannot submit article without content — add content first');
     }
 
-    return this.prisma.article.update({
-      where: { id: articleId },
-      data: { status: ArticleStatus.SUBMITTED },
-      select: {
-        id: true, slug: true, title: true, status: true,
-        publishedAt: true, coverImageUrl: true, authorId: true,
-        createdAt: true, updatedAt: true,
-      },
-    });
+    const [updated] = await this.prisma.$transaction([
+      this.prisma.article.update({
+        where: { id: articleId },
+        data: { status: ArticleStatus.SUBMITTED },
+        select: {
+          id: true, slug: true, title: true, status: true,
+          publishedAt: true, coverImageUrl: true, authorId: true,
+          createdAt: true, updatedAt: true,
+        },
+      }),
+      this.logEvent(articleId, userId, article.status, ArticleStatus.SUBMITTED),
+    ]);
+
+    return updated;
   }
 
   async publish(articleId: string, userId: string, role: Role): Promise<ArticleSummary> {
@@ -240,15 +257,20 @@ export class ArticlesService {
     this.assertTransition(article.status, ArticleStatus.PUBLISHED);
 
     // Slug is now permanently locked — publishedAt set once, never changed
-    return this.prisma.article.update({
-      where: { id: articleId },
-      data: { status: ArticleStatus.PUBLISHED, publishedAt: new Date() },
-      select: {
-        id: true, slug: true, title: true, status: true,
-        publishedAt: true, coverImageUrl: true, authorId: true,
-        createdAt: true, updatedAt: true,
-      },
-    });
+    const [updated] = await this.prisma.$transaction([
+      this.prisma.article.update({
+        where: { id: articleId },
+        data: { status: ArticleStatus.PUBLISHED, publishedAt: new Date() },
+        select: {
+          id: true, slug: true, title: true, status: true,
+          publishedAt: true, coverImageUrl: true, authorId: true,
+          createdAt: true, updatedAt: true,
+        },
+      }),
+      this.logEvent(articleId, userId, article.status, ArticleStatus.PUBLISHED),
+    ]);
+
+    return updated;
   }
 
   async reject(
@@ -285,6 +307,7 @@ export class ArticlesService {
           editorNote,
         },
       }),
+      this.logEvent(articleId, userId, article.status, ArticleStatus.DRAFT, editorNote),
     ]);
 
     return updated;
@@ -299,15 +322,20 @@ export class ArticlesService {
 
     this.assertTransition(article.status, ArticleStatus.ARCHIVED);
 
-    return this.prisma.article.update({
-      where: { id: articleId },
-      data: { status: ArticleStatus.ARCHIVED },
-      select: {
-        id: true, slug: true, title: true, status: true,
-        publishedAt: true, coverImageUrl: true, authorId: true,
-        createdAt: true, updatedAt: true,
-      },
-    });
+    const [updated] = await this.prisma.$transaction([
+      this.prisma.article.update({
+        where: { id: articleId },
+        data: { status: ArticleStatus.ARCHIVED },
+        select: {
+          id: true, slug: true, title: true, status: true,
+          publishedAt: true, coverImageUrl: true, authorId: true,
+          createdAt: true, updatedAt: true,
+        },
+      }),
+      this.logEvent(articleId, userId, article.status, ArticleStatus.ARCHIVED),
+    ]);
+
+    return updated;
   }
 
   async getRevisions(articleId: string, userId: string, role: Role): Promise<RevisionSummary[]> {
@@ -362,5 +390,18 @@ export class ArticlesService {
         `Cannot transition from ${current} to ${target}`,
       );
     }
+  }
+
+  // Returns a Prisma promise suitable for inclusion in a $transaction array
+  private logEvent(
+    articleId: string,
+    actorId: string,
+    fromStatus: ArticleStatus,
+    toStatus: ArticleStatus,
+    note?: string,
+  ) {
+    return this.prisma.articleEvent.create({
+      data: { articleId, actorId, fromStatus, toStatus, note: note ?? null },
+    });
   }
 }

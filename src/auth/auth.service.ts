@@ -15,9 +15,14 @@ import { LoginDto } from './dto/login.dto';
 const BCRYPT_ROUNDS = 12;
 const REFRESH_TOKEN_TTL_DAYS = 7;
 
+export interface AuthUser {
+  id: string; email: string; name: string; role: Role; bio: string | null; avatarUrl: string | null;
+}
+
 export interface TokenPair {
   accessToken: string;
   refreshToken: string;
+  user: AuthUser;
 }
 
 interface JwtRefreshPayload {
@@ -36,7 +41,7 @@ export class AuthService {
   async register(dto: RegisterDto): Promise<TokenPair> {
     const passwordHash = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
 
-    let user: { id: string; email: string; role: Role };
+    let user: AuthUser;
     try {
       user = await this.prisma.user.create({
         data: {
@@ -45,7 +50,7 @@ export class AuthService {
           name: dto.name,
           role: Role.READER,
         },
-        select: { id: true, email: true, role: true },
+        select: { id: true, email: true, name: true, role: true, bio: true, avatarUrl: true },
       });
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
@@ -54,13 +59,13 @@ export class AuthService {
       throw err;
     }
 
-    return this.issueTokenPair(user.id, user.email, user.role);
+    return this.issueTokenPair(user.id, user.email, user.role, user);
   }
 
   async login(dto: LoginDto): Promise<TokenPair> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email.toLowerCase() },
-      select: { id: true, email: true, role: true, passwordHash: true, isActive: true },
+      select: { id: true, email: true, name: true, role: true, bio: true, avatarUrl: true, passwordHash: true, isActive: true },
     });
 
     // Constant-time check — compare even if user not found to prevent timing attacks
@@ -71,7 +76,17 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.issueTokenPair(user.id, user.email, user.role);
+    const { passwordHash: _, isActive: __, ...authUser } = user;
+    return this.issueTokenPair(user.id, user.email, user.role, authUser);
+  }
+
+  async getMe(userId: string): Promise<AuthUser> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, name: true, role: true, bio: true, avatarUrl: true },
+    });
+    if (!user) throw new UnauthorizedException('User not found');
+    return user;
   }
 
   async refresh(refreshToken: string): Promise<{ accessToken: string }> {
@@ -118,6 +133,7 @@ export class AuthService {
     userId: string,
     email: string,
     role: Role,
+    user: AuthUser,
   ): Promise<TokenPair> {
     const accessToken = this.signAccessToken(userId, email, role);
     const refreshToken = uuidv4(); // opaque token stored in DB
@@ -129,7 +145,7 @@ export class AuthService {
       data: { userId, token: refreshToken, expiresAt },
     });
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, user };
   }
 
   private signAccessToken(userId: string, email: string, role: Role): string {
