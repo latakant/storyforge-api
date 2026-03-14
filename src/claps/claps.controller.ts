@@ -7,18 +7,23 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ClapsService } from './claps.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser, CurrentUserPayload } from '../common/decorators/current-user.decorator';
 
+@ApiTags('claps')
+@ApiBearerAuth('access-token')
 @Controller('articles/:articleId/claps')
 export class ClapsController {
   constructor(private readonly clapsService: ClapsService) {}
 
-  // AUTHENTICATED — any logged-in user can clap
+  // AUTHENTICATED — 50 claps/min per IP
   @Post()
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
+  @Throttle({ claps: { limit: 50, ttl: 60_000 } })
   clap(
     @Param('articleId') articleId: string,
     @CurrentUser() user: CurrentUserPayload,

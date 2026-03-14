@@ -10,12 +10,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { TagsService } from './tags.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 
+@ApiTags('tags')
+@ApiBearerAuth('access-token')
 @Controller('tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
