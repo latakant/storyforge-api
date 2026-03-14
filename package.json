@@ -17,7 +17,10 @@
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "dag": "node scripts/dag.js",
+    "dag:visualize": "node scripts/dag.js visualize",
+    "dag:next": "node scripts/dag.js next"
   },
   "dependencies": {
     "@nestjs/bullmq": "^10.2.1",
