@@ -12,3 +12,4 @@ ai/logs/.trace
 web/.next/
 web/node_modules/
 web/.env.local
+web/
