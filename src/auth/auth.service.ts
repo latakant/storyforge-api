@@ -25,6 +25,7 @@ export interface TokenPair {
   user: AuthUser;
 }
 
+// Kept for potential future JWT-based refresh; currently tokens are opaque UUIDs
 interface JwtRefreshPayload {
   sub: string;
   type: string;
@@ -90,27 +91,14 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string): Promise<{ accessToken: string }> {
-    let payload: JwtRefreshPayload;
-    try {
-      payload = this.jwt.verify<JwtRefreshPayload>(refreshToken, {
-        secret: this.config.getOrThrow<string>('JWT_REFRESH_SECRET'),
-      });
-    } catch {
-      throw new UnauthorizedException('Invalid or expired refresh token');
-    }
-
-    if (payload.type !== 'refresh') {
-      throw new UnauthorizedException('Wrong token type');
-    }
-
-    // Verify token exists in DB (not logged out)
+    // Tokens are opaque UUIDs — look up by value in DB (no JWT verification)
     const stored = await this.prisma.refreshToken.findUnique({
       where: { token: refreshToken },
       include: { user: { select: { id: true, email: true, role: true, isActive: true } } },
     });
 
     if (!stored || stored.expiresAt < new Date() || !stored.user.isActive) {
-      throw new UnauthorizedException('Session expired — please log in again');
+      throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
     const accessToken = this.signAccessToken(

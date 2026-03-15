@@ -23,7 +23,7 @@ export class ClapsController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
-  @Throttle({ claps: { limit: 50, ttl: 60_000 } })
+  @Throttle({ default: { limit: 50, ttl: 60_000 } })
   clap(
     @Param('articleId') articleId: string,
     @CurrentUser() user: CurrentUserPayload,

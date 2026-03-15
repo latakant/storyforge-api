@@ -1,6 +1,7 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bullmq';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -22,12 +23,12 @@ import { validateEnv } from './common/config/env.validation';
       isGlobal: true,
       validate: validateEnv,
     }),
-    // Global rate limiter — default: 60 req/min per IP
-    // Specific endpoints override via @Throttle({ default: { limit, ttl } })
+    // Global rate limiter — 60 req/min per IP (default only)
+    // Named throttlers (claps=50/min, comments=10/hr) are applied only on
+    // their specific endpoints via @Throttle decorator — NOT globally, so
+    // they do NOT count against all routes.
     ThrottlerModule.forRoot([
       { name: 'default', ttl: 60_000, limit: 60 },
-      { name: 'claps',    ttl: 60_000, limit: 50 },  // 50 claps/min
-      { name: 'comments', ttl: 3_600_000, limit: 10 }, // 10 comments/hr
     ]),
     // BullMQ — Redis-backed job queue for email notifications
     BullModule.forRootAsync({
@@ -50,6 +51,10 @@ import { validateEnv } from './common/config/env.validation';
     DiscoveryModule,
     MailerModule,
     AdminModule,
+  ],
+  providers: [
+    // Bind ThrottlerGuard globally — applies to every route automatically
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule implements NestModule {

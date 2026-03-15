@@ -28,7 +28,7 @@ export class CommentsController {
   // AUTHENTICATED (READER+) — 10 comments/hr per IP
   @Post()
   @UseGuards(JwtAuthGuard)
-  @Throttle({ comments: { limit: 10, ttl: 3_600_000 } })
+  @Throttle({ default: { limit: 10, ttl: 3_600_000 } })
   create(
     @Param('articleId') articleId: string,
     @Body() dto: CreateCommentDto,

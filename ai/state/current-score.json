@@ -1,0 +1,26 @@
+{
+  "overall": 88,
+  "decision": "ALLOW",
+  "threshold": 85,
+  "lastRun": "2026-03-15",
+  "domains": {
+    "financial":      { "score": null,  "note": "No financial logic in scope" },
+    "security":       { "score": 88,    "note": "JWT+RBAC+rate-limit solid; no HTTPS config yet" },
+    "concurrency":    { "score": 85,    "note": "Prisma handles DB; no race conditions found" },
+    "queue":          { "score": 82,    "note": "BullMQ mailer working; no DLQ/retry visible" },
+    "errorHandling":  { "score": 88,    "note": "Exception filter maps P2002/P2025; no raw 500s" },
+    "typeSafety":     { "score": 90,    "note": "No any; DTOs+class-validator; interfaces clean" },
+    "dbHealth":       { "score": 88,    "note": "All FKs indexed; audit log; timestamps on all models" }
+  },
+  "e2e": {
+    "pass": 67,
+    "fail": 0,
+    "total": 67,
+    "lastRun": "2026-03-15"
+  },
+  "openIssues": {
+    "high": 0,
+    "medium": 0,
+    "low": 2
+  }
+}

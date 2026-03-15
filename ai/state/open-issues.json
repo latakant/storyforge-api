@@ -1,0 +1,20 @@
+[
+  {
+    "id": "SF-01",
+    "severity": "low",
+    "domain": "queue",
+    "title": "BullMQ mailer has no DLQ / retry config",
+    "detail": "The mailer.processor.ts does not configure a Dead Letter Queue or max retry count. Failed email jobs are silently dropped after exhausting Bull default retries.",
+    "fix": "Add `attempts: 3, backoff: { type: 'exponential', delay: 5000 }` to the job options in mailer.service.ts and set up a failed-job event listener.",
+    "status": "open"
+  },
+  {
+    "id": "SF-02",
+    "severity": "low",
+    "domain": "security",
+    "title": "No HTTPS / CORS config in main.ts",
+    "detail": "main.ts enables CORS via `app.enableCors()` without an explicit allowedOrigins list. In production this allows any origin. SSL termination is expected at the reverse-proxy level but not documented.",
+    "fix": "Pass `origin: process.env.CORS_ORIGINS?.split(',')` to `enableCors()`. Document that SSL must be terminated at the proxy.",
+    "status": "open"
+  }
+]
