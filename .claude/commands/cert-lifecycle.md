@@ -44,7 +44,7 @@ node scripts/lifecycle.js log --action=<action> --module=<module> --detail="<det
 
 If script not found or errors:
 - Check: `ls scripts/lifecycle.js`
-- If missing: log manually to `ai/lifecycle/LAYER_LOG.md` using the standard format from `ai/core/MASTER-v7.3.md`
+- If missing: log manually to `ai/lifecycle/LAYER_LOG.md` using the standard format from `ai/core/MASTER-v11.3.md`
 
 ---
 
@@ -61,7 +61,7 @@ This links the runtime event (System 1) to the code change (System 2) — the mo
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

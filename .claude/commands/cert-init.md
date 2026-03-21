@@ -7,7 +7,7 @@ Read only: ai/VERSION.md (3 lines) before starting.
 Do NOT load ai/ files to validate them — use `ls` and `head -1` only.
 Full file reads only if a specific problem is found (not upfront).
 Self-build rule: if creating missing files, write from memory template — do not read existing files as reference.
-Budget protocol: ai/core/TOKEN_BUDGET.md
+Budget protocol: ai/core/MASTER-v11.3.md (TOKEN_BUDGET merged)
 
 $ARGUMENTS
 
@@ -64,10 +64,10 @@ Auto-create `ai/learning/pending-patterns.json` if missing — it starts with `{
 |------|---------|
 | `ai/STATUS.md` | must exist |
 | `ai/AI-MANUAL.md` | must exist |
-| `ai/core/MASTER-v7.3.md` | must exist |
-| `ai/core/TOKEN_BUDGET.md` | must exist |
-| `ai/core/EXECUTION_PROTOCOL.md` | must exist |
-| `ai/core/RESPONSE_PROTOCOL.md` | must exist |
+| `ai/core/MASTER-v11.3.md` | must exist |
+| `ai/core/MASTER-v11.3.md (TOKEN_BUDGET merged)` | must exist |
+| `ai/core/MASTER-v11.3.md` | EXECUTION_PROTOCOL merged here |
+| `ai/core/MASTER-v11.3.md` | RESPONSE_PROTOCOL merged here |
 | `ai/lifecycle/LAYER_LOG.md` | must exist |
 | `ai/lifecycle/SPEC_LOG.md` | must exist |
 | `ai/fixes/applied/FIX_LOG.md` | must exist |
@@ -123,7 +123,7 @@ Next:
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ### If READY:
 ```

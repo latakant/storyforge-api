@@ -14,7 +14,7 @@
 ║               ║ - Add new features or refactor (scope: bug fix only) ║
 ║               ║ - Skip TypeScript check                             ║
 ║               ║ - Push to remote without explicit user approval     ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║               ║ - Symptom described by user                         ║
 ║ ESCALATES     ║ - Schema change needed → HARD HALT → PA Phase 2    ║
 ║               ║ - Can't reproduce → PARTIAL (provide repro steps)  ║

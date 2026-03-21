@@ -1,4 +1,4 @@
-<!-- Load ai/core/MASTER-v7.3.md before executing this skill -->
+<!-- Load ai/core/MASTER-v11.3.md before executing this skill -->
 Execute the full BUG: protocol from AI-MANUAL.md.
 
 $ARGUMENTS
@@ -34,6 +34,27 @@ Steps — execute in strict order, do not skip any:
   7. Types — `any` used? Wrong type reaching DB silently?
   8. DB health — index on every FK and high-traffic field?
 - Determine path: TRIVIAL (1-3 line, no schema) / FEATURE / ARCH
+
+---
+
+**STEP 3.5 — Risk Check (surface to human BEFORE touching code)**
+
+Output this block before any code change:
+
+```
+⚠️  RISK CHECK
+─────────────────────────────────────────────────────
+Invariants affected : [list from 8 questions above, or NONE]
+Layers touched      : [e.g. L3_DTO · L4_SERVICE · L7_IMPL]
+Could break         : [what downstream could be affected, or NONE]
+Schema change       : [YES → requires migration | NO]
+PA required         : [YES — ARCH path | NO — TRIVIAL/FEATURE]
+Safe to proceed     : [YES | NEEDS REVIEW]
+─────────────────────────────────────────────────────
+```
+
+If `Safe to proceed: NEEDS REVIEW` → STOP. Do not write code. Explain the risk and wait for human confirmation.
+If `Safe to proceed: YES` → continue to Step 4.
 
 ---
 
@@ -92,12 +113,44 @@ Append to `ai/learning/pending-patterns.json` inside the `"pending"` array:
   "root_cause_category": "validation | auth | db-query | state | config | race-condition | type-mismatch | missing-guard | other",
   "symptom": "<one line: HTTP status + what the error looked like>",
   "fix_pattern": "<one line: what class of fix solved it>",
+  "verification": {
+    "expected": ["<key signal expected in logs/output after fix>"],
+    "observed": ["<what actually appeared — from Step 8.6>"],
+    "status": "PASS | FAIL | SKIP"
+  },
+  "watchpoints": ["<area 1 to watch in future>", "<area 2 if any>"],
   "promoted": false
 }
 ```
 
 Output: `PATTERN CAPTURED → pending-patterns.json`
 If `pending` array now has > 3 unpromoted entries: output `⚠️ 3+ patterns pending — run /cortex-learn to promote.`
+
+---
+
+**STEP 8.6 — Verify the fix + extract watchpoints (mandatory)**
+
+This is what separates a trusted pattern from a guess.
+
+**Verification:**
+Look at the actual output, logs, or test result after the fix was applied.
+- What signals confirm the fix worked? (e.g. "200 OK", "Redis connected", "test passed", "no tsc errors")
+- What did you actually observe?
+- Set `status`:
+  - `PASS` — observed matches expected
+  - `FAIL` — fix did not resolve the issue (go back to Step 3)
+  - `SKIP` — no observable signal available (log it honestly)
+
+**Watchpoints:**
+From this bug, what areas of this module are risky going forward?
+These are forward-looking risk indicators — things to check first next time this area is touched.
+Examples: "Redis availability on startup", "route ordering in controller", "DTO missing new field"
+
+If a new watchpoint is worth persisting:
+- Append to `ai/memory/watchpoints.md` using the format already in that file
+- ID: `WP-<next-number>` · module · risk (HIGH/MEDIUM/LOW) · what to check first
+
+Run: `node scripts/lifecycle.js log --action=BUG_FIXED --module=<module> --detail="<fix>" --category=VERIFY --verdict=<PASS|FAIL>`
 
 ---
 
@@ -138,7 +191,7 @@ DETAIL: <one-line description of what was fixed>
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,5 +1,19 @@
 Run the CORTEX learning intelligence cycle. This directly grows the pattern library.
 
+TWO TYPES OF LEARNING — know the difference:
+
+  PROJECT-LEVEL (this skill handles):
+    Bug patterns from real fixes → diagnose.js → KNOWN next time
+    Instincts → instincts.json → graduated after 3 observations + confidence ≥ 0.8
+    Cross-project sharing via orchestrator
+
+  FRAMEWORK-LEVEL (goes to MASTER + LEARNING-PATH, not diagnose.js):
+    Learnings about HOW Cortex itself works — design principles, governance rules,
+    patterns discovered by running Cortex (not by fixing project bugs).
+    Examples: Route Echo pattern · No Loose Ends rule · mark() alignment rule
+    These go to: core/MASTER-vX.Y.md (changelog) + LEARNING-PATH.md (Level 7)
+    NOT to diagnose.js — they are framework knowledge, not bug classifiers.
+
 ---
 
 **STEP 1 — Maturity baseline**
@@ -14,6 +28,40 @@ This scans diagnoses with no matching pattern and generates proposals in `ai/lea
 
 Also read: `ai/learning/pending-patterns.json`
 Find all entries where `"promoted": false`. These are reactive captures from `/cortex-bug` and `/dev-debugger` that need review. Include them in the proposals list for Step 3.
+
+---
+
+**STEP 2.5 — Refusal Gate Analysis**
+
+Read REFUSAL_GATE entries from the execution log:
+```bash
+grep "REFUSAL_GATE" ai/logs/cortex-execution.jsonl 2>/dev/null | tail -100
+```
+
+If NO entries → output: `Refusal Gate: no refusals logged this cycle` and skip.
+
+If entries exist, extract and output:
+```
+REFUSAL GATE ANALYSIS
+─────────────────────────────────────────────────────
+  /do  refusals: [N]  top reason: [ambiguous_intent | unbounded_scope]
+  /fix refusals: [N]  top reason: [no_error_signal | no_location]
+
+  Quality signal: [N of N] refusals followed by successful retry
+                  → high-quality gate (users re-submitted with better input)
+
+  Rate verdict:
+    HIGH  (refusals > 30% of total /do+/fix invocations)
+      → Flag: "STOP messages may be confusing — review gate language quality"
+    BALANCED  (5–30%)
+      → No action needed. Gate is working correctly.
+    LOW   (< 5%)
+      → Flag: "Gate may be too permissive — re-check Minimum Input Contracts"
+─────────────────────────────────────────────────────
+```
+
+**Why this matters:** High-quality refusal = users retry with better input and succeed.
+High-frequency refusal = users bypass Cortex. You cannot distinguish these without this log.
 
 ---
 
@@ -135,6 +183,51 @@ This feeds `/cortex-observe metrics` and the session brief anomaly detection.
 
 ---
 
+**STEP 9.5 — Outcome Pattern Analysis (if iteration data exists)**
+
+Check: does `ai/learning/outcome-log.json` exist?
+If NO → skip this step silently.
+
+If YES → read it and analyze:
+
+```
+OUTCOME PATTERNS FOUND
+─────────────────────────────────────────────────────
+Iterations analyzed: [N]
+
+Highest-feedback domains (most post-launch changes):
+  1. [domain] — [N] feedback items across [N] iterations
+  2. [domain] — [N] feedback items
+  3. [domain] — ...
+
+Most common change type:
+  MINOR [N]% · FEATURE [N]% · STRATEGIC [N]%
+
+Pattern signals:
+  [If one domain dominates feedback → flag: "This domain is consistently under-specified at blueprint time"]
+  [If STRATEGIC changes are frequent → flag: "Founder thinking layer may need more validation upfront"]
+  [If MINOR changes dominate → flag: "Implementation is solid, UX needs polish"]
+─────────────────────────────────────────────────────
+```
+
+If a domain appears in 3+ iteration reports as the top feedback source:
+  → Add an instinct to `ai/learning/instincts.json`:
+  ```json
+  {
+    "id": "over-iterated-domain-[name]",
+    "trigger": "when blueprinting a [product-type] product",
+    "action": "spend extra design time on [domain] — historically generates most post-launch feedback",
+    "confidence": 0.6,
+    "evidence_count": [N],
+    "last_triggered": "[today]"
+  }
+  ```
+
+This closes the outcome loop:
+  Build → Ship → Iterate → Learn → better Blueprint → Build...
+
+---
+
 **STEP 10 — Prompt for architectural decisions**
 
 If this cert-learn cycle was triggered after a major build session, prompt:
@@ -252,7 +345,7 @@ Next `/cortex-learn` run will pick it up in Step 2.
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

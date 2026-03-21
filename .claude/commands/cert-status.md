@@ -30,7 +30,7 @@ If score differs from `current-score.json`, note the delta and ask the user if t
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

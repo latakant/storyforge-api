@@ -1,4 +1,4 @@
-<!-- Load ai/core/MASTER-v7.3.md and ai/memory/team-roles.md before executing this skill -->
+<!-- Load ai/core/MASTER-v11.3.md and ai/memory/team-roles.md before executing this skill -->
 Execute the full MODIFY: protocol — changing existing feature behaviour.
 
 $ARGUMENTS
@@ -142,7 +142,7 @@ DETAIL: <one-line: old behaviour → new behaviour>
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

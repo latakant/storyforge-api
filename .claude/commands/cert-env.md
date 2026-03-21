@@ -9,7 +9,7 @@
 ║ CANNOT        ║ - Read .env (live secrets — never)                  ║
 ║               ║ - Modify any source or config files                 ║
 ║               ║ - Push to remote                                     ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║ ESCALATES     ║ - Required var missing at startup → HARD HALT      ║
 ║               ║ - Secret in .env.example with real value → HALT    ║
 ║ OUTPUTS       ║ - ENV AUDIT REPORT                                  ║

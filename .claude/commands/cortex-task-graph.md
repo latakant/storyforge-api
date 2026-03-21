@@ -77,12 +77,30 @@ Each node in the graph:
   "parallelWith": ["node-id-3"],
   "blockedReason": null,
   "assignedSession": null,
-  "completedAt": null
+  "completedAt": null,
+  "retryCount": 0,
+  "gateResult": null
 }
 ```
 
 **dependsOn:** This task CANNOT start until all listed nodes are `done`.
 **parallelWith:** This task CAN run at the same time as listed nodes (no data dependency).
+**retryCount:** Incremented by `/cert-gate` on each FAIL verdict. Capped at 3 — node becomes `blocked` at 3.
+**gateResult:** Written by `/cert-gate` after the node's skill completes. Shape:
+```json
+{
+  "verdict": "PASS | WARN | FAIL",
+  "timestamp": "ISO-8601",
+  "phases": {
+    "typescript": "PASS | FAIL | SKIP",
+    "tests": "PASS | FAIL | SKIP",
+    "secrets": "PASS | FAIL",
+    "invariants": "PASS | FAIL | N/A"
+  },
+  "failedPhases": [],
+  "failureDetail": "human-readable summary of what failed"
+}
+```
 
 ---
 

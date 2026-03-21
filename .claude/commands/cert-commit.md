@@ -97,9 +97,36 @@ DETAIL: <commit message one-liner>
 
 ---
 
+**STEP 8 — Health token check (Cortex framework commits only)**
+
+Only applies when committing to the Cortex framework repo itself (CWD contains `HEALTH.md`).
+Skip entirely when committing to any project that uses Cortex.
+
+```bash
+[ -f "HEALTH.md" ] && echo "cortex repo — check health token"
+```
+
+If this is a Cortex framework commit, ask: do the staged files affect any of these?
+- `skills/` — any skill file added, changed, or deleted
+- `REGISTRY.json` — project entries changed
+- `core/MASTER-*.md` — master spec changed
+- `package.json` version field — version bumped
+- A health gap opened or closed
+
+If YES to any → remind:
+```
+⚠️ HEALTH TOKEN — update required
+  Staged changes affect Cortex internals.
+  Before closing session: update HEALTH.md token.
+  Run all 8 checks → set CORTEX-[HEALTHY|DEGRADED|ALARM]-v{version}-{YYYYMMDD}-{N}/8
+  See: HEALTH.md → TOKEN UPDATE PROTOCOL
+```
+
+If NO → skip silently.
+
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -12,7 +12,7 @@
 ║               ║ - Modify schema.prisma                              ║
 ║               ║ - Add new features during refactor                  ║
 ║               ║ - Proceed if tests fail before refactor starts      ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║               ║ - Green test suite BEFORE refactor begins           ║
 ║ ESCALATES     ║ - Tests fail after refactor → HARD HALT             ║
 ║               ║ - Contract change needed → HARD HALT                ║

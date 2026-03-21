@@ -12,7 +12,7 @@
 ║               ║ - Read actual .env values                           ║
 ║               ║ - Send real OTP/email/payment transactions          ║
 ║               ║ - Push to remote                                    ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                             ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                             ║
 ║               ║ - App server(s) running before this skill executes  ║
 ║ ESCALATES     ║ - Any CRITICAL service down → DEMO BLOCKED          ║
 ║ OUTPUTS       ║ - DEMO READY / DEMO BLOCKED verdict per service     ║

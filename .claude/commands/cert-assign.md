@@ -12,7 +12,7 @@
 ║ CANNOT        ║ - Modify any source code                           ║
 ║               ║ - Override PA escalation requirements              ║
 ║               ║ - Assign a resource outside their certified tiers  ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                           ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                           ║
 ║               ║ - core/resource-registry.md accessible            ║
 ║ OUTPUTS       ║ - Assigned resource + fitness score                ║
 ║               ║ - Context to load + first skill to run            ║

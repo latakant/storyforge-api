@@ -96,7 +96,7 @@ Run: `node scripts/lifecycle.js log --action=FEATURE_REMOVED --module=<module> -
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

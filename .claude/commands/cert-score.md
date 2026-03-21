@@ -2,6 +2,52 @@ Run enterprise governance scoring and produce a domain-level report.
 
 ---
 
+## FALSE-POSITIVE WHITELIST
+
+Before reporting violations, filter out known false positives that are permanently
+accepted for this project. These will NEVER surface as actionable violations.
+
+Check for a whitelist file:
+```bash
+cat ai/state/checker-whitelist.json 2>/dev/null
+```
+
+Format of `ai/state/checker-whitelist.json`:
+```json
+{
+  "whitelist": [
+    {
+      "id": "SEC-05",
+      "reason": "Rate limiting handled at nginx/gateway layer — not in app code",
+      "accepted_by": "architect",
+      "date": "2026-03-17"
+    },
+    {
+      "id": "ERR-02",
+      "reason": "Global exception filter covers all unhandled errors — per-module try/catch not required",
+      "accepted_by": "architect",
+      "date": "2026-03-17"
+    },
+    {
+      "id": "QUAL-02",
+      "reason": "TODO comments in ai/ directory are governance notes, not production code",
+      "accepted_by": "architect",
+      "date": "2026-03-17"
+    }
+  ]
+}
+```
+
+If the whitelist file exists:
+- Filter checker output to remove any violation whose `id` matches a whitelist entry
+- When displaying violations, add a note: `[N whitelisted — see ai/state/checker-whitelist.json]`
+- Whitelisted items NEVER affect the score and NEVER appear as actionable violations
+
+To ADD a new whitelist entry: run `/cert-score whitelist <rule-id> "<reason>"`
+To REMOVE an entry: manually edit `ai/state/checker-whitelist.json` and delete the entry.
+
+---
+
 **STEP 1 — Fresh checker run**
 Run: `node scripts/enterprise-checker.js --check`
 
@@ -60,7 +106,7 @@ Update `ai/learning/skill-usage.json`:
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

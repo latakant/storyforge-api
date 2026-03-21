@@ -1,13 +1,13 @@
 # /cortex-meta — Skill 77
 # Meta-skill: Analyze and develop CORTEX itself
 # Turns CORTEX's own governance tools inward — on its own skill files
-# v8.0 | TIER: 15 | BUDGET: ARCH
+# v11.2 | TIER: 15 | BUDGET: ARCH
 
 ---
 
 ```
 ╔══════════════════════════════════════════════════════════════════════╗
-║  CERT  /cortex-meta  |  v8.0  |  TIER: 15  |  BUDGET: ARCH         ║
+║  CERT  /cortex-meta  |  v11.2  |  TIER: 15  |  BUDGET: ARCH        ║
 ╠═══════════════╦══════════════════════════════════════════════════════╣
 ║ LAYER SCOPE   ║ L1 · L5 · L6 · L9                                   ║
 ║ AUTHORITY     ║ GOVERNOR                                             ║
@@ -57,7 +57,7 @@ Use it to:
 /cortex-meta develop         → fix identified gaps in-session
 /cortex-meta propose <area>  → propose a new skill for an area
 /cortex-meta build <skill>   → build a new skill file from scratch
-/cortex-meta diff            → compare current state vs CORTEX-v8.0-BUILD-PROMPT.md
+/cortex-meta diff            → compare current state vs CORTEX-v11.2-BUILD-PROMPT.md
 ```
 
 ---
@@ -107,8 +107,8 @@ WARN  → completion block present but missing Next: field
 
 ### 2.3 File path references correct?
 ```
-PASS  → all ai/ references use ai/core/MASTER-v8.0.md
-FAIL  → references old path ai/CORTEX-MASTER.md or ai/core/MASTER-v7.3.md
+PASS  → all ai/ references use ai/core/MASTER-v11.3.md
+FAIL  → references old path ai/CORTEX-MASTER.md or ai/core/MASTER-v11.3.md or ai/core/MASTER-v11.3.md
 ```
 
 ### 2.4 Skill has budget class declared?
@@ -150,7 +150,7 @@ FAIL  → skill has no steps and no output format
 
 ## Phase 3 — Coverage Gap Analysis
 
-Compare skill inventory against the v8.0 spec tiers:
+Compare skill inventory against the v11.2 spec tiers:
 
 ```
 TIER 1  Session Management     (target: 5)   actual: N   gap: X
@@ -188,10 +188,10 @@ GAP-N: Missing /skill-name
 For each core protocol file in core/:
 
 ```
-MASTER-v8.0.md          → Check: all 30 principles present?
-RESPONSE_PROTOCOL.md    → Check: 4 block formats present?
-TOKEN_BUDGET.md         → Check: all 9 keyword triggers listed?
-EXECUTION_PROTOCOL.md   → Check: parallel-safe pairs listed?
+MASTER-v11.3.md          → Check: all 30 principles present?
+MASTER-v11.3.md      → Check: 4 block formats present? (RESPONSE_PROTOCOL merged)
+MASTER-v11.3.md      → Check: token budget rules present? (TOKEN_BUDGET merged)
+MASTER-v11.3.md      → Check: parallel-safe pairs listed? (EXECUTION_PROTOCOL merged)
 INVARIANT_PROTOCOL.md   → Check: 3 tiers with examples?
 CERTIFICATION_PROTOCOL.md → Check: 7 cert fields described?
 PA_PROTOCOL.md          → Check: PA paths 1-4 + Emergency?
@@ -216,7 +216,7 @@ Mode: {audit|develop|propose|build|diff}
 
 ## Inventory
 Skills found:   {N} ({N} universal + {N} adapter + {N} ecom)
-Target (v8.0):  77
+Target (v11.2): 86
 Gap:            {N missing}
 
 ## Health Scores

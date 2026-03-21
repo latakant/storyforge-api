@@ -22,7 +22,7 @@
 - Old MASTER versions: `ai/core/MASTER-v*.md` where version < current
 - Superseded upgrade installers: `CORTEX-UPGRADE-v*.md` for versions < current
 - Old bootstrap/prompt files: `CORTEX-v*-BOOTSTRAP.md` · `PROMPT-TEMP-*.md` · `PROMPT.md`
-- Duplicate core protocols: older versions of TOKEN_BUDGET, EXECUTION_PROTOCOL etc.
+- Duplicate core protocols: older versions of TOKEN_BUDGET, EXECUTION_PROTOCOL (both merged into MASTER-v11.3.md) etc.
 
 ### Group B — Stale project files
 - Temp/scratch files: `*.tmp` · `*.bak` · `*.log` (root level) · `debug-*` · `test-output-*`
@@ -73,7 +73,7 @@ Rules for REVIEW:
 
 Rules for KEEP (never suggest removal):
 - Current MASTER (`ai/core/MASTER-v{current}.md`)
-- Active protocols (`EXECUTION_PROTOCOL.md` · `RESPONSE_PROTOCOL.md` · `TOKEN_BUDGET.md`)
+- Active protocols (all merged into MASTER-v11.3.md)
 - The combined full installer (most recent `CORTEX-UPGRADE-*-FULL.md`)
 - All `ai/spec/` files (spec is precious — never auto-suggest)
 - All `ai/memory/` files
@@ -197,7 +197,7 @@ DETAIL: /cortex-clean — {n} files removed · {n} kept · {n} skipped
 
 ---
 
-## Step 7 — Completion block (RESPONSE_PROTOCOL.md)
+## Step 7 — Completion block (MASTER-v11.3.md)
 
 ### If files deleted:
 ```

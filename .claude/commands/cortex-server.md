@@ -15,6 +15,13 @@
 
 /cortex-server — start, stop, and monitor the Cortex orchestrator.
 
+**CORTEX_ROOT resolution** (resolve before running any command):
+```bash
+CORTEX_ROOT="${CORTEX_ROOT:-$(d=$(pwd); while [ "$d" != "/" ]; do [ -f "$d/REGISTRY.json" ] && echo "$d" && break; d=$(dirname "$d"); done)}"
+CORTEX_ROOT="${CORTEX_ROOT:-$HOME/.cortex}"
+```
+All paths below use `$CORTEX_ROOT`.
+
 The orchestrator (localhost:7391) enables:
   - Task graph sync across sessions
   - Shared pattern library (cross-project learning)
@@ -100,7 +107,7 @@ CORTEX — Start Orchestrator
 ✓ Port 7391 is free
 
 [2/3] Launch orchestrator process
-→ node C:/luv/Cortex/server/index.js
+→ node $CORTEX_ROOT/server/index.js
 ✓ Process started
 
 [3/3] Verify health
@@ -125,8 +132,8 @@ STATUS : FAILED at step 3/3
 Reason : Server process started but not responding
 Fix    :
   1. Check port free   → netstat -ano | findstr 7391
-  2. Check deps        → cd C:/luv/Cortex && npm install
-  3. Check logs        → node C:/luv/Cortex/server/index.js (foreground)
+  2. Check deps        → cd $CORTEX_ROOT && npm install
+  3. Check logs        → node $CORTEX_ROOT/server/index.js (foreground)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 

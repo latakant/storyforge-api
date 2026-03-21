@@ -243,10 +243,14 @@ Laws to enforce:   [list the most critical System Laws for this product type]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 READY FOR BLUEPRINT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Run next:
+Run next (recommended order):
+  /cortex-validate            ← stress-test the idea before investing in architecture
+  OR (if already validated):
   /cortex-plan new "[product name]"
   OR
   /cortex-blueprint idea "[product name — [one-line description]]" app-type [type]
+
+Note: /cortex-validate reads ai/idea-brief.md automatically — no extra args needed.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -295,7 +299,8 @@ Extracted: [N] system primitives from founder input
 File     : ai/idea-brief.md written
 Domains  : [list detected]
 Adapters : [list recommended]
-Next     : /cortex-plan new "[product]"
+Next     : /cortex-validate                   ← recommended first
+           OR /cortex-plan new "[product]"
            OR /cortex-blueprint idea "[one-liner]"
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```

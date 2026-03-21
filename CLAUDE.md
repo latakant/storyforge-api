@@ -29,7 +29,7 @@ Frontend: Next.js 15 (App Router) · React 19 · Tailwind 4 · React Query 5
 
 ## 4. GOVERNANCE
 
-CORTEX CERTIFIED — all AI work governed by Cortex v11.
+CORTEX CERTIFIED — all AI work governed by Cortex v12.0.
 - Every session: /cert-session
 - Every code change: /cert-commit
 - New project: /cortex-plan new "StoryForge"

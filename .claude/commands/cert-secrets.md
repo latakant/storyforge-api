@@ -10,7 +10,7 @@
 ║ CANNOT        ║ - Read .env (live file — never)                     ║
 ║               ║ - Modify any file                                   ║
 ║               ║ - Push to remote                                     ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║ ESCALATES     ║ - Secret found in git history → HARD HALT + PA     ║
 ║               ║ - Secret hardcoded in src/ → HARD HALT             ║
 ║ OUTPUTS       ║ - SECRETS HYGIENE REPORT                            ║

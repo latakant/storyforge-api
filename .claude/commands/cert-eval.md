@@ -9,7 +9,7 @@
 ║               ║ - Append results to ai/lifecycle/LAYER_LOG.md       ║
 ║ CANNOT        ║ - Modify source code based on eval results alone    ║
 ║               ║ - Auto-promote evals to CI without PA review        ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                             ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                             ║
 ║ ESCALATES     ║ - pass^k < 80% on CRITICAL path → HARD HALT        ║
 ║ OUTPUTS       ║ - Eval report · pass@k · pass^k · grader verdict    ║
 ║               ║ - Completion block (COMPLETE or HARD HALT)          ║

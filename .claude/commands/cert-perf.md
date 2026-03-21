@@ -11,7 +11,7 @@
 ║ CANNOT        ║ - Modify src/ files (use /cortex-fix for that)      ║
 ║               ║ - Run migrations or DB commands                     ║
 ║               ║ - Push to remote                                     ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║ ESCALATES     ║ - N+1 on high-traffic endpoint → HIGH issue         ║
 ║               ║ - Missing index on FK/filter field → HIGH issue     ║
 ║               ║ - Blocking operation in async context → HIGH        ║

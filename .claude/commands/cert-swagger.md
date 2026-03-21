@@ -9,7 +9,7 @@
 ║               ║ - Read src/main.ts (Swagger setup verification)     ║
 ║ CANNOT        ║ - Change DTO validation logic                       ║
 ║               ║ - Change controller route handlers                  ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║               ║ - @nestjs/swagger installed                         ║
 ║ OUTPUTS       ║ - @ApiProperty on DTOs + @ApiOperation on routes    ║
 ║               ║ - Completion block: COMPLETE                        ║

@@ -11,7 +11,7 @@
 ║               ║ - Read actual .env values (check presence only)     ║
 ║               ║ - Connect to external networks                      ║
 ║               ║ - Auto-fix findings (report only — human decides)   ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                             ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                             ║
 ║ ESCALATES     ║ - CRITICAL finding → HARD HALT (stop + report)      ║
 ║ OUTPUTS       ║ - Security grade (A–F) · findings by severity       ║
 ║               ║ - Completion block (COMPLETE or HARD HALT)          ║

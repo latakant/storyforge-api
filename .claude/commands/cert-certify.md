@@ -1,6 +1,6 @@
 ```
 ╔══════════════════════════════════════════════════════════════════════╗
-║  CERT  /cortex-certify  |  v8.0  |  TIER: 6  |  BUDGET: MODERATE   ║
+║  CERT  /cortex-certify  |  v11.2  |  TIER: 6  |  BUDGET: MODERATE   ║
 ╠═══════════════╦══════════════════════════════════════════════════════╣
 ║ LAYER SCOPE   ║ L5 · L9                                             ║
 ║ AUTHORITY     ║ ANALYST                                              ║
@@ -10,7 +10,7 @@
 ║ CANNOT        ║ - Modify skill logic or step content                ║
 ║               ║ - Modify src/ files                                 ║
 ║               ║ - Push to remote                                     ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded (cert block spec)          ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded (cert block spec)          ║
 ║ ESCALATES     ║ - Skill with no OUTPUTS field → flag for PA review  ║
 ║ OUTPUTS       ║ - CERTIFICATION REPORT                              ║
 ║               ║ - Missing cert blocks added to skill files          ║
@@ -28,17 +28,17 @@ Parse: `scope` (optional) — `audit` (report only) | `fix` (add missing blocks)
 
 ## WHAT IS A VALID CERT BLOCK?
 
-Per MASTER-v8.0.md, every v8 skill MUST begin with:
+Per MASTER-v11.3.md, every skill MUST begin with:
 
 ```
 ╔══════════════════════════════════════════════════════════════════════╗
-║  CERT  /skill-name  |  v8.0  |  TIER: N  |  BUDGET: LEAN/MOD/ARCH  ║
+║  CERT  /skill-name  |  v11.2  |  TIER: N  |  BUDGET: LEAN/MOD/ARCH  ║
 ╠═══════════════╦══════════════════════════════════════════════════════╣
 ║ LAYER SCOPE   ║ [L1 through L10 — which layers this skill touches]  ║
 ║ AUTHORITY     ║ [OBSERVER|ANALYST|EXECUTOR|BUILDER|GOVERNOR|ORCH]   ║
 ║ CAN           ║ - [explicit file paths or operations]               ║
 ║ CANNOT        ║ - [hard limits]                                     ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║ ESCALATES     ║ - [condition] → [HARD HALT | PA Phase N]           ║
 ║ OUTPUTS       ║ - [deliverables]                                    ║
 ║               ║ - Completion block (COMPLETE|PARTIAL|FAILED|HALT)  ║
@@ -81,8 +81,8 @@ Build the audit table:
 ```
 SKILL CERTIFICATION AUDIT
 ─────────────────────────────────────────────────────────────
-[skill-name]            v8.0 ✅ CERTIFIED    AUTHORITY: [level]
-[skill-name]            v7.x ❌ UNCERTIFIED  → needs cert block
+[skill-name]            v11.2 ✅ CERTIFIED    AUTHORITY: [level]
+[skill-name]            pre-v11.2 ❌ UNCERTIFIED  → needs cert block
 ─────────────────────────────────────────────────────────────
 Certified:   [N]
 Uncertified: [N]
@@ -108,7 +108,7 @@ For skills that DO have a cert block, validate each field:
 ## STEP 3 — ADD MISSING CERT BLOCKS (if scope = `fix`)
 
 For each UNCERTIFIED skill, generate the correct cert block based on:
-1. The skill name → maps to TIER via MASTER-v8.0.md skill quick-reference
+1. The skill name → maps to TIER via MASTER-v11.3.md skill quick-reference
 2. The skill content → infer AUTHORITY from what operations it performs
 3. The skill's existing steps → infer LAYER SCOPE, CAN, CANNOT, ESCALATES, OUTPUTS
 
@@ -134,7 +134,7 @@ The cert block MUST NOT modify any existing content below it.
 
 ## STEP 4 — TIER ASSIGNMENT VERIFICATION
 
-Cross-check every skill's declared TIER against the official assignment in MASTER-v8.0.md:
+Cross-check every skill's declared TIER against the official assignment in MASTER-v11.3.md:
 
 ```
 Tier 1  — Session: cortex-session, cortex-status, cortex-init, cortex-help, cortex-roles
@@ -167,7 +167,7 @@ Tier 14 — E-Commerce India: ecom-orders, ecom-payments, ecom-cart, ecom-invent
 CORTEX CERTIFICATION REPORT — {date}
 ═════════════════════════════════════════════════════════
 Total skills scanned:  [N]
-Certified (v8.0):      [N] ✅
+Certified (v11.2):      [N] ✅
 Uncertified:           [N] ❌ (added cert blocks if scope=fix)
 Invalid fields:        [N] ⚠ (flagged for PA review)
 ═════════════════════════════════════════════════════════
@@ -190,6 +190,6 @@ CORTEX  /cortex-certify                 COMPLETE
 Skills     [N] scanned | [N] certified | [N] fixed
 Flagged    [N] for PA review
 Logged     LAYER_LOG (CERTIFY) · {date}
-Next       [/cortex-commit "chore: certify all skills v8.0" | PA review required]
+Next       [/cortex-commit "chore: certify all skills v11.2" | PA review required]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```

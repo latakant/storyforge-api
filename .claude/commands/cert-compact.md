@@ -9,7 +9,7 @@
 ║               ║ - Run /compact with summary                         ║
 ║ CANNOT        ║ - Modify source code                                ║
 ║               ║ - Auto-compact without user awareness               ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                             ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                             ║
 ║ OUTPUTS       ║ - Compaction decision + state snapshot              ║
 ║               ║ - Completion block (COMPACT NOW or CONTINUE)        ║
 ╚═══════════════╩══════════════════════════════════════════════════════╝

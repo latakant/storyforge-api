@@ -10,7 +10,7 @@
 ║               ║ - Write ai/lifecycle/LAYER_LOG.md (PREDICT)         ║
 ║ CANNOT        ║ - Modify any src/ files                             ║
 ║               ║ - Run migrations or commands                         ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║ OUTPUTS       ║ - RISK PREDICTION REPORT                            ║
 ║               ║ - Completion block: COMPLETE or PARTIAL             ║
 ╚═══════════════╩══════════════════════════════════════════════════════╝

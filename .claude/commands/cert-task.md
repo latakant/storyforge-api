@@ -28,7 +28,7 @@ cortex task chain cortex-build orders cortex-build payments cortex-build invoice
 ---
 
 ## TOKEN BUDGET
-Load before starting: EXECUTION_PROTOCOL.md (Rule 2 — context bundle spec)
+Load before starting: MASTER-v11.3.md (was: EXECUTION_PROTOCOL.md — merged) (Rule 2 — context bundle spec)
 This skill itself is lean — it delegates; it does not execute build logic.
 
 ---
@@ -37,7 +37,7 @@ This skill itself is lean — it delegates; it does not execute build logic.
 
 ### Step 1 — Classify the task
 
-Read EXECUTION_PROTOCOL.md Rule 1:
+Read MASTER-v11.3.md (was: EXECUTION_PROTOCOL.md — merged) Rule 1:
 - 1-2 builds → recommend going conversational (no isolation needed)
 - 3+ builds → proceed with isolation
 - Always: full bootstrap / extract → proceed with isolation
@@ -110,7 +110,7 @@ When sub-agent returns TASK RESULT block:
 4. Extract `Feeds into:` → pass as context to next task in chain
 5. Do NOT re-read sub-agent's written files — trust the result
 
-### Step 5.5 — Emit completion block (RESPONSE_PROTOCOL.md)
+### Step 5.5 — Emit completion block (MASTER-v11.3.md)
 
 After processing the result, ALWAYS output to the user:
 
@@ -140,7 +140,7 @@ Next       <what to complete the gap>
 ```
 
 If sub-agent returned Status: FAILED:
-- Log to LAYER_LOG first (TYPE: ERROR, see RESPONSE_PROTOCOL.md Rule 3)
+- Log to LAYER_LOG first (TYPE: ERROR, see MASTER-v11.3.md (RESPONSE_PROTOCOL merged))
 - Then output:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -179,7 +179,7 @@ For `cortex task chain <s1> <s2> <s3>`:
 
 ## Parallel Execution Rules
 
-Read EXECUTION_PROTOCOL.md Rule 4 before launching parallel tasks.
+Read MASTER-v11.3.md (was: EXECUTION_PROTOCOL.md — merged) Rule 4 before launching parallel tasks.
 
 Safe parallel pairs for Exena:
 ```

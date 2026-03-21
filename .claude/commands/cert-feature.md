@@ -1,4 +1,4 @@
-<!-- Load ai/core/MASTER-v7.3.md and ai/memory/team-roles.md before executing this skill -->
+<!-- Load ai/core/MASTER-v11.3.md and ai/memory/team-roles.md before executing this skill -->
 Execute the full FEATURE: protocol from AI-MANUAL.md.
 
 $ARGUMENTS
@@ -37,7 +37,9 @@ If PA required → STOP and present what needs PA approval before proceeding.
 **STEP 1 — Path classification**
 - Read `ai/AI-MANUAL.md` (Three Paths section)
 - Read `ai/context/forbidden.md`
+  - If not found: apply CLAUDE.md coding standards (no cross-module DB, no circular imports, no `any`)
 - Read `ai/context/invariants.md`
+  - If not found: use CLAUDE.md critical business rules section instead
 - Classify: TRIVIAL / FEATURE / ARCH
 
 If **ARCH path** — stop here and list what requires explicit human approval before proceeding:
@@ -52,10 +54,18 @@ Do not proceed past Step 1 on ARCH path without "approved" or "go ahead" from th
 
 ---
 
-**STEP 2 — Read existing code**
-- Read the relevant controller, service, and DTOs for the affected module
-- Read the related Mermaid diagram in `ai/mermaid/`
+**STEP 2 — Ground + Read existing code**
+
+**Run /cert-ground "<feature description>"** — before reading anything manually.
+
+- 🔴 BLOCKED → stop (feature may already exist, or baseline is broken) — resolve first
+- ⚠ REVIEW NEEDED → feature or parts of it may already be implemented — adjust scope
+- ✅ GROUNDED → proceed with verified file/symbol state as anchor
+
+After grounding:
+- Read the related Mermaid diagram in `ai/mermaid/` (cert-ground doesn't cover these)
 - Read `ai/app.prd.md` — confirm the feature isn't already specced differently
+- Use cert-ground's Ground Truth block instead of re-reading controller/service/DTOs
 
 ---
 
@@ -129,7 +139,7 @@ DETAIL: <one-line description of what was built>
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -39,6 +39,138 @@ Parse from $ARGUMENTS:
 
 ---
 
+## PHASE 0 — Build Constraints Intake
+
+Before reasoning about architecture, understand the constraints the product must be built within.
+Architecture that ignores constraints produces over-engineered systems for small teams or
+under-engineered systems for high-scale products.
+
+### 0.1 Check for existing constraints
+
+If `ai/build-constraints.md` exists → read it, skip Q&A, go to Phase 0.5.
+
+### 0.1b — Outcome history check (item 3)
+
+Before asking constraints, check if past iteration data exists:
+
+```
+CHECK: does ai/learning/outcome-log.json exist?
+```
+
+If YES → read it. Identify domains with the most feedback across all iterations:
+
+```
+OUTCOME HISTORY FOUND ([N] iterations)
+─────────────────────────────────────────────────────
+High-feedback domains (ranked by total feedback items):
+  1. [domain] — [N] items across [N] iterations  ← HIGH RISK
+  2. [domain] — [N] items
+  3. ...
+─────────────────────────────────────────────────────
+These domains need extra design attention in this blueprint.
+They have historically generated the most post-launch change requests.
+```
+
+Carry this HIGH RISK list into Phase 6 (Risk Analysis) — auto-add these domains to the risk register.
+
+If outcome-log.json does NOT exist → skip silently. Note: "First project — no outcome history."
+
+---
+
+### 0.2 Ask 4 constraint questions (if no file exists)
+
+Ask these one at a time (or extract from $ARGUMENTS if provided):
+
+**Q1 — Team size**
+"How many engineers will build this? (1 solo / 2–4 small team / 5–10 / 10+)"
+
+Maps to:
+```
+1 solo      → monolith-first, no microservices, minimal infra complexity
+2–4 small   → modular monolith ok, 1–2 external services max
+5–10        → modular monolith or light services, CI/CD needed
+10+         → can support service split, platform team warranted
+```
+
+**Q2 — Scale target (first 12 months)**
+"How many users do you realistically expect in the first year? (<1K / 1K–50K / 50K–500K / 500K+)"
+
+Maps to:
+```
+< 1K        → simple Postgres, no caching, no queue needed
+1K–50K      → add Redis cache + BullMQ queue, indexing matters
+50K–500K    → CDN, read replicas, rate limiting, queue workers
+500K+       → horizontal scaling, sharding strategy, infra team
+```
+
+**Q3 — Budget tier**
+"What infrastructure budget are you working with? (bootstrap / seed / series-a / enterprise)"
+
+Maps to:
+```
+bootstrap   → Vercel + Supabase/Railway. No managed services.
+seed        → Small VPS/cloud. 1–2 managed services (Redis, Email).
+series-a    → Full cloud (AWS/GCP/Azure). Managed everything.
+enterprise  → On-prem / dedicated. Compliance infra included.
+```
+
+**Q4 — Timeline to first launch**
+"When do you need an MVP in users' hands? (4 weeks / 3 months / 6 months / 12 months)"
+
+Maps to:
+```
+4 weeks     → Only core transaction. Cut everything else.
+3 months    → Core + 1 supporting flow (e.g. auth + orders + basic payment).
+6 months    → Full MVP with auth, core domain, payments, basic admin.
+12 months   → Complete product with all domains, analytics, performance work.
+```
+
+### 0.3 Write constraints summary
+
+```
+BUILD CONSTRAINTS
+─────────────────────────────────────────────────────
+Team:         [1 solo | 2-4 | 5-10 | 10+]
+Scale target: [<1K | 1K-50K | 50K-500K | 500K+]
+Budget:       [bootstrap | seed | series-a | enterprise]
+Timeline:     [4 weeks | 3 months | 6 months | 12 months]
+─────────────────────────────────────────────────────
+Architecture tier: [MINIMAL | STANDARD | SCALED | ENTERPRISE]
+  (derived: solo+bootstrap+4weeks=MINIMAL, 5-10+seed+6months=STANDARD, etc.)
+─────────────────────────────────────────────────────
+```
+
+Save to `ai/build-constraints.md`.
+
+### 0.4 — Pipeline enforcement (item 4)
+
+Check if idea was validated before blueprint:
+
+```
+CHECK: does ai/idea-report.md exist?
+```
+
+If YES → read recommendation field:
+- `PROCEED` or `PROCEED WITH CAUTION` → continue normally
+- `PIVOT` → warn: `⚠️ Idea report recommends PIVOT. Address weaknesses before blueprinting. Type OVERRIDE to continue anyway.` Wait for input.
+- `ABANDON` → halt: `🚨 Idea report recommends ABANDON. Do not generate architecture for an abandoned idea. Run /cortex-intake to redefine the idea first.`
+
+If NO → output soft warning, do not block:
+```
+⚠️  No idea-report.md found.
+    Skipping /cortex-validate increases risk of building the wrong thing.
+    Continue anyway? [Y] or run /cortex-validate first.
+```
+Wait for user confirmation before continuing.
+User types Y or any text → continue. User runs /cortex-validate → respect its output.
+
+These constraints directly influence:
+- Phase 3 (service architecture complexity — monolith vs services)
+- Phase 4 (law validation — stricter for SCALED/ENTERPRISE)
+- Phase 7 (phased plan — MVP scope cut for MINIMAL tier)
+
+---
+
 ## PHASE 0.5 — Decision Knowledge Check
 
 Before reasoning begins, check if Cortex has seen this domain before.
@@ -156,6 +288,40 @@ CUSTOM DOMAINS NEEDED
 ---
 
 ## PHASE 3 — System Blueprint
+
+### 3.0 Architecture tier decision (from Phase 0 constraints)
+
+Apply constraints from `ai/build-constraints.md` before designing services:
+
+```
+ARCHITECTURE TIER RULES
+─────────────────────────────────────────────────────
+MINIMAL (solo + bootstrap + <3 months):
+  → Single monolith. All domains in one app. No queues unless payments require it.
+  → Recommended stack: Next.js fullstack OR NestJS + Postgres + Railway/Supabase
+  → Do NOT recommend: microservices, Kafka, K8s, Redis (unless caching critical path)
+
+STANDARD (2-4 team + seed + 3-6 months):
+  → Modular monolith. Domains are modules, not services. 1 queue (BullMQ).
+  → Recommended: NestJS modules + Postgres + Redis + 1 worker process
+  → Optional: split auth service if security requires isolation
+
+SCALED (5-10 team + series-a + 6-12 months):
+  → Modular monolith → extract hot domains as services when needed.
+  → CI/CD required. Read replicas. CDN. Rate limiting from day 1.
+  → Microservices allowed for: payments, notifications, media processing
+
+ENTERPRISE (10+ team + enterprise budget):
+  → Services from the start. Platform team owns infra.
+  → Compliance, audit logging, dedicated security boundary per domain.
+─────────────────────────────────────────────────────
+```
+
+Flag if the product model demands a higher tier than constraints allow:
+```
+⚠️  CONSTRAINT MISMATCH: Product needs SCALED tier (500K users) but team is solo + bootstrap.
+    Recommend: Build MINIMAL MVP first, validate, then scale infra after traction.
+```
 
 ### 3.1 Service architecture
 
@@ -304,6 +470,38 @@ EXTERNAL DEPENDENCY FAILURES
 
 ---
 
+### 6.1 — Write Risk Report artifact
+
+After completing the RISK REGISTER output, write it as a standalone named file:
+
+**File:** `ai/risk-report.md`
+
+```markdown
+# Risk Report — [Product Name]
+> Generated by /cortex-blueprint Phase 6 | Date: [today]
+> Blueprint: ai/blueprint.md
+
+## Risk Register
+[paste full RISK REGISTER table here]
+
+## Race Conditions
+[paste RACE CONDITIONS TO GUARD section here]
+
+## External Dependency Failures
+[paste EXTERNAL DEPENDENCY FAILURES section here]
+
+---
+## Summary
+- Total risks: [N]  (HIGH: [N] · MED: [N] · LOW: [N])
+- Race conditions: [N]
+- External dependencies: [N]
+- Action required before code: [YES — fix HIGH items | NO — all mitigated]
+```
+
+This file is the deliverable for Phase 6. Reference it in the blueprint under `## Risk Register`.
+
+---
+
 ## PHASE 7 — Phased Implementation Plan
 
 Sequence domains by dependency order (foundation first):
@@ -431,6 +629,69 @@ Structure:
 *Approved:*
 *Code generation unlocked: [YES | NO — resolve blockers first]*
 ```
+
+---
+
+### 8.1 — Auto-generate Mermaid diagrams
+
+After writing the main blueprint sections, append three Mermaid diagram blocks to `ai/blueprint.md`:
+
+**Block 1 — System Architecture**
+```markdown
+## System Architecture
+
+```mermaid
+graph LR
+  subgraph Clients
+    WEB[Web App]
+    MOB[Mobile App]
+    ADM[Admin Panel]
+  end
+  subgraph API [[API — [stack]]]
+    [for each service: SVC_NAME([ServiceName])]
+  end
+  subgraph External
+    [for each external dep: EXT_NAME[[ExternalName]]]
+  end
+  WEB --> API
+  MOB --> API
+  ADM --> API
+  [for each service→external connection: SVC_NAME --> EXT_NAME]
+```
+```
+
+**Block 2 — Core State Machine** (primary lifecycle entity — order, booking, subscription, etc.)
+```markdown
+## [Entity] State Machine
+
+```mermaid
+stateDiagram-v2
+  [*] --> [INITIAL_STATE]
+  [for each transition from Phase 7 plan:
+    FROM_STATE --> TO_STATE : [actor/event]
+  ]
+  [TERMINAL_STATE_1] --> [*]
+  [TERMINAL_STATE_2] --> [*]
+```
+```
+
+**Block 3 — Domain Dependency Graph**
+```markdown
+## Domain Graph
+
+```mermaid
+graph TD
+  [for each required domain from Phase 2:
+    DOMAIN_NAME([Domain Name])
+  ]
+  [for each critical flow from Phase 3.3:
+    SOURCE_DOMAIN --> TARGET_DOMAIN
+  ]
+```
+```
+
+Generate these from the data already produced in Phases 2, 3, and 4.
+Use only domains and flows explicitly identified — do not invent connections.
 
 ---
 

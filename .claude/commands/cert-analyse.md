@@ -1,4 +1,4 @@
-<!-- Load ai/core/MASTER-v7.3.md and ai/core/ANALYSIS_ENGINE.md before executing this skill -->
+<!-- Load ai/core/MASTER-v11.3.md and ai/core/ANALYSIS_ENGINE.md before executing this skill -->
 Autonomous analysis, synthesis, and execution pipeline. Finds all project problems, scores and sequences them, waits for one approval, then executes everything.
 
 **Flags:**
@@ -380,7 +380,7 @@ Update `ai/learning/skill-usage.json` after every invocation (any flag):
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ### After Phase 3 (report + gate — user approves plan):
 ```

@@ -50,13 +50,22 @@ Level N (all done):     deploy → last
 Execution loop:
 1. Read graph. Find NEXT-ready nodes (pending, all deps done).
 2. If multiple NEXT-ready → run in parallel via `cert-parallel graph`.
-3. Mark each done as it completes. Re-check for newly unlocked nodes.
-4. If a node is BLOCKED → halt that branch. Continue other branches if independent.
-5. Repeat until all nodes done or all branches blocked.
+3. Each node's skill completes → run `/cert-gate [node-id]` before marking done.
+4. cert-gate PASS or WARN  → mark node `done`. Re-check for newly unlocked nodes.
+   cert-gate FAIL (retry < 3) → increment retryCount · re-run node's skill with failure context injected.
+   cert-gate FAIL (retry = 3) → mark node `blocked`, reason: "gate failed 3×" · halt that branch.
+5. BLOCKED node: do not unlock dependents. Continue all independent branches.
+6. Repeat until all nodes done or all branches blocked.
 
 Resume support:
 - If graph already has `done` nodes → skip them, start from first pending.
 - Output: "Resuming — [N] nodes already done, [M] remaining."
+
+Gate retry protocol (when re-running a failed node):
+- Inject gate failure detail as context: "Previous attempt failed: [failureDetail]. Fix this before producing output."
+- The skill that runs the node re-reads the existing files + failure context and corrects them.
+- If the node type is `test` and gate failed on coverage → instruct tdd-guide to add more test cases.
+- If the node type is `service`/`endpoint` and gate failed on invariants → instruct to add the missing pattern.
 
 ---
 
@@ -119,7 +128,44 @@ If argument is `graph`:
 - Read `ai/task-graph.json`
 - Check for existing progress (any `done` nodes → resume mode)
 - Execute the graph loop (see WORKFLOW TYPES > graph above)
-- Skip Steps 1–5 below (graph loop replaces manual phase execution)
+- Skip Steps 0.5 and 1–5 below (graph loop replaces manual phase execution)
+
+### Step 0.5 — Complexity gate (non-graph modes only)
+
+Before spawning any agent, score the task using the 80/20 rule.
+80% of tasks are SIMPLE — handle them inline. Spawning agents for simple tasks
+wastes tokens, adds latency, and adds coordination overhead with no benefit.
+
+Score the task on 5 dimensions (same as cortex-intent Step 1.5):
+
+| Dimension | 0 pts | 1 pt | 2 pts |
+|-----------|-------|------|-------|
+| Files to change | 1 | 2–3 | 4+ |
+| Modules/domains touched | 1 | 2 | 3+ |
+| Financial / auth / webhook involved | no | — | yes |
+| Similar pattern already exists in codebase | yes (−2) | — | no |
+| Schema or migration change needed | no | — | yes |
+
+**Score → decision:**
+
+```
+0–3  SIMPLE   → Do NOT spawn agents. Handle inline.
+               Output: "80/20: SIMPLE (N/10) — handling inline"
+               Jump to Step 5 (produce output directly, no agent chain)
+
+4–6  MODERATE → Spawn exactly ONE agent.
+               Choose: tdd-guide (new code) | code-reviewer (review) |
+                       architect (ARCH decision) | security-reviewer (auth/payment)
+               Output: "80/20: MODERATE (N/10) — 1 agent: [name]"
+               Run that agent only. Skip remaining workflow agents.
+
+7–10 COMPLEX  → Full agent chain is justified. Proceed with Steps 1–5.
+               Output: "80/20: COMPLEX (N/10) — full chain: [agents in order]"
+```
+
+**Override:** if the user explicitly passes `--force-chain`, skip this gate and run the full chain.
+
+---
 
 ### Step 1 — Parse workflow
 Identify the workflow type and task description from $ARGUMENTS.
@@ -159,8 +205,14 @@ GRAPH STATE (if graph mode)
 ─────────────────────────────
 Total       {N} nodes
 Done        {N} ✅
-Blocked     {N} 🚫 — [list blocked node ids]
+Blocked     {N} 🚫 — [list blocked node ids + gate failure reason]
 Remaining   {N} ⏸
+
+GATE RESULTS
+─────────────
+Passed      {N} nodes — gate PASS on first attempt
+Retried     {N} nodes — gate FAIL, recovered on retry {1|2}
+Blocked     {N} nodes — gate FAIL, 3 retries exhausted
 
 PHASE RESULTS
 ─────────────

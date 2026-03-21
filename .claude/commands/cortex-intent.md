@@ -66,6 +66,46 @@ Scope:    [single engine | multi-engine | full lifecycle]
 
 ---
 
+## STEP 1.5 — Complexity Score (80/20 gate)
+
+Score the task on 5 dimensions before deciding how many agents to spawn.
+80% of tasks are SIMPLE — handle them inline. Only 20% justify a full agent chain.
+
+| Dimension | 0 pts | 1 pt | 2 pts |
+|-----------|-------|------|-------|
+| Files to change | 1 file | 2–3 files | 4+ files |
+| Modules/domains touched | 1 module | 2 modules | 3+ modules |
+| Financial / auth / webhook involved | no | — | yes |
+| Similar pattern already exists in codebase | yes (−2) | — | no |
+| Schema or migration change needed | no | — | yes |
+
+**Score → Agent mode:**
+
+```
+0–3   SIMPLE    → INLINE       — Claude handles directly. No sub-agent spawned.
+4–6   MODERATE  → SINGLE-AGENT — One specialist agent. Choose most relevant.
+7–10  COMPLEX   → FULL-CHAIN   — Multi-agent chain. Full orchestration justified.
+```
+
+**Agent selection for MODERATE (pick one):**
+- New code to write → `tdd-guide`
+- Existing code to review → `code-reviewer`
+- Architecture decision → `architect`
+- Security-sensitive change → `security-reviewer`
+
+**Rule:** never spawn more agents than the score justifies.
+If score is SIMPLE but you're tempted to spawn agents anyway → handle inline.
+
+Add to INTENT DETECTED output:
+```
+─────────────────────────────────────────────────────
+Complexity: [SIMPLE / MODERATE / COMPLEX]  (score: N/10)
+Agent mode: [INLINE / SINGLE-AGENT: <name> / FULL-CHAIN: <names>]
+─────────────────────────────────────────────────────
+```
+
+---
+
 ## STEP 2 — Engine Resolution
 
 Map intent → engine chain:
@@ -76,7 +116,13 @@ ENGINE ROUTING TABLE
 PLAN   → cortex-blueprint
          (idea → domain map → law validation → phased plan)
 
-DESIGN → cortex-design → dev-frontend-component(s) → dev-frontend-page
+DESIGN (section / UI pattern) →
+         design-section [type] [product] → design-layout [page] → design-review
+         (section content + copy → page arrangement → audit before handoff)
+         Note: use this path for landing pages, UI sections, design specs
+
+DESIGN (product feature / app screen) →
+         cortex-design → dev-frontend-component(s) → dev-frontend-page
          (UX flow → component tree → production code)
          Note: if blueprint not done yet, run cortex-blueprint first
 

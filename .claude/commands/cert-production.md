@@ -137,26 +137,17 @@ Type 1 / 2 / 3:
 
 Branch:
 - **1** → mark PASS → proceed to HITL-2
-- **2** → ask "Which are missing?" → for each, output where to get it:
-  - `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` → "Razorpay Dashboard → Settings → API Keys"
-  - `RAZORPAY_WEBHOOK_SECRET` → "Razorpay Dashboard → Settings → Webhooks → your webhook → Secret"
-  - `CLOUDINARY_*` → "Cloudinary Dashboard → Settings → API Keys"
-  - Core vars → see /cortex-staging HITL-1 for guidance
-  - Ask: "Done? Type Y to continue or list still-missing vars."
-  - Repeat until all confirmed → PASS → proceed to HITL-2
-- **3** → output:
+- **2** or **3** → HARD HALT immediately:
   ```
-  node -e "
-  const vars = ['DATABASE_URL','JWT_SECRET','JWT_REFRESH_SECRET',
-    'RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET',
-    'CLOUDINARY_CLOUD_NAME','CLOUDINARY_API_KEY','CLOUDINARY_API_SECRET',
-    'NODE_ENV','CORS_ORIGINS'];
-  vars.forEach(v => console.log(v + ':', process.env[v] ? 'SET' : 'MISSING'));
-  "
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  CORTEX  /cortex-production            HARD HALT
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Blocked    H1 — Not all 11 env vars confirmed
+  Required   Set all 11 vars in your production environment
+             then re-run /cortex-production
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ```
-  Ask: "Type the MISSING ones or CLEAR if all set."
-  - CLEAR → PASS → proceed to HITL-2
-  - Missing listed → give recovery steps per var → loop until CLEAR
+  Do not proceed to HITL-2. Stop here.
 
 ---
 

@@ -10,7 +10,7 @@
 ║               ║ - Write ai/lifecycle/LAYER_LOG.md (CHANGELOG)       ║
 ║ CANNOT        ║ - Modify src/ files                                 ║
 ║               ║ - Push tags to remote without explicit approval      ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║               ║ - Git log access                                     ║
 ║ OUTPUTS       ║ - CHANGELOG.md entry (Keep-a-Changelog format)      ║
 ║               ║ - Completion block: COMPLETE                        ║

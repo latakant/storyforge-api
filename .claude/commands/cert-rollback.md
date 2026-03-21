@@ -1,4 +1,4 @@
-<!-- Load ai/core/MASTER-v7.3.md before executing this skill -->
+<!-- Load ai/core/MASTER-v11.3.md before executing this skill -->
 Safely undo a fix. Always confirm with user before executing. Never auto-rollback.
 
 $ARGUMENTS
@@ -113,7 +113,7 @@ Next: Run /cortex-bug fresh to diagnose the root cause properly.
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

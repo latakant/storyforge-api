@@ -1,4 +1,4 @@
-<!-- Load ai/core/MASTER-v7.3.md and ai/memory/team-roles.md before executing this skill -->
+<!-- Load ai/core/MASTER-v11.3.md and ai/memory/team-roles.md before executing this skill -->
 Team roles view, work type analysis, and handoff logging.
 
 $ARGUMENTS
@@ -158,7 +158,7 @@ After any /cortex-roles invocation:
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

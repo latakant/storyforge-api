@@ -5,14 +5,14 @@ Read: ai/VERSION.md (4 lines) to detect current version. That's it for orientati
 Grep for package usage instead of reading full files upfront.
 When upgrading CORTEX itself (ai/ files): write-forward pattern — write new files from memory templates,
 do NOT re-read files you just wrote. Verify with `head -3` not full reads.
-Full budget protocol: ai/core/TOKEN_BUDGET.md
+Full budget protocol: ai/core/MASTER-v11.3.md (TOKEN_BUDGET merged)
 
 $ARGUMENTS
 
 Parse from $ARGUMENTS: what is being upgraded, from version, to version (e.g., "prisma 6.19 → 6.20" or "nestjs 10.4 → 11.0").
 
 **If upgrading CORTEX (ai/ files or .claude/commands/):**
-Use lean install rules from ai/core/TOKEN_BUDGET.md:
+Use lean install rules from ai/core/MASTER-v11.3.md (TOKEN_BUDGET merged):
 - Stage 1: identify what needs changing (read VERSION.md + list directory)
 - Stage 2: write new/updated files one at a time from in-memory template
 - Stage 3: verify each file (head -3 only)
@@ -109,7 +109,7 @@ Run: `node scripts/lifecycle.js log --action=DEPENDENCY_ADDED --module=<scope> -
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

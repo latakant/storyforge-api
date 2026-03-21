@@ -10,7 +10,7 @@
 ║               ║ - Write ai/lifecycle/LAYER_LOG.md (PATTERN_QUERY)   ║
 ║ CANNOT        ║ - Modify src/ files                                 ║
 ║               ║ - Promote patterns (use /cortex-learn)              ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║ OUTPUTS       ║ - Pattern query result                              ║
 ║               ║ - Completion block: COMPLETE                        ║
 ╚═══════════════╩══════════════════════════════════════════════════════╝

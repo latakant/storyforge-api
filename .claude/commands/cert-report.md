@@ -1,8 +1,23 @@
 Generate CORTEX stakeholder reports — one for founders (non-technical) and one for developers.
 
+HARD RULE — SINGLE SOURCE OF TRUTH:
+  ALL metrics (test counts, scores, endpoints, models) come from `ai/STATUS.md`.
+  Never write a number into a report from memory, a previous session, or a prior report.
+  If STATUS.md is stale → run /cortex-verify (Phase 6) first to sync it, then report.
+  Reports are readers, not holders. They propagate STATUS.md — they never own data.
+
+---
+
+**STEP 0 — Verify STATUS.md is current (always run first)**
+
+Read `ai/STATUS.md`. Check the "Last governance run" date.
+If it is not today → WARN: "STATUS.md may be stale. Run /cortex-verify to sync metrics before generating this report."
+Do NOT block report generation — warn and proceed. But flag it clearly.
+
 ---
 
 **STEP 1 — Gather data**
+Read: `ai/STATUS.md` ← PRIMARY SOURCE for all counts and scores
 Read: `ai/state/current-score.json`
 Read: `ai/state/open-issues.json`
 Read: `ai/TRACKER.md` (last 3 session entries only)
@@ -69,7 +84,7 @@ Update `ai/learning/skill-usage.json`:
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

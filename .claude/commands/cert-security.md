@@ -11,7 +11,7 @@
 ║ CANNOT        ║ - Modify any src/ files (use /cortex-hotfix)        ║
 ║               ║ - Read .env (live secrets — never)                  ║
 ║               ║ - Push to remote                                     ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║ ESCALATES     ║ - Hardcoded secret found → HARD HALT (P3 CRITICAL) ║
 ║               ║ - Auth bypass found → HARD HALT                     ║
 ║               ║ - SQL injection path → HARD HALT                    ║

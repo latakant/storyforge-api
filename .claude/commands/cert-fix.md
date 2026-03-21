@@ -27,9 +27,17 @@ From the issue details:
 
 ---
 
-**STEP 3 — Read the target file**
-Read the specific file and line numbers from the issue entry.
-Understand the current code before changing it.
+**STEP 3 — Ground + Read target**
+
+**Run /cert-ground "<issue description>"** before touching any file.
+
+- 🔴 BLOCKED → stop (e.g. file missing, TypeScript baseline broken) — resolve first
+- ⚠ REVIEW NEEDED → issue may already be partially fixed or affect different files — check
+- ✅ GROUNDED → Ground Truth block is your verified snapshot for the fix session
+
+If cert-ground finds the issue is already fixed → verify with the fix test, close the issue, stop.
+Otherwise: use the verified file/symbol snapshot from cert-ground as the base. Do not re-read
+files that cert-ground already read — trust the snapshot.
 
 ---
 
@@ -105,7 +113,7 @@ DETAIL: [ISSUE-ID] closed: <what was fixed>
 
 ---
 
-## Completion block (RESPONSE_PROTOCOL.md)
+## Completion block (MASTER-v11.3.md)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

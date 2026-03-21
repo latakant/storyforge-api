@@ -10,7 +10,7 @@
 ║ CANNOT        ║ - Modify any source code                            ║
 ║               ║ - Run git operations                                ║
 ║               ║ - Create or delete files (only append/update)       ║
-║ REQUIRES      ║ - MASTER-v8.0.md loaded                            ║
+║ REQUIRES      ║ - MASTER-v11.3.md loaded                            ║
 ║ ESCALATES     ║ - Nothing (read + append only)                     ║
 ║ OUTPUTS       ║ - Session summary · Next session primer             ║
 ║               ║ - Completion block (COMPLETE)                       ║

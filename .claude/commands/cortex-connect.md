@@ -12,7 +12,44 @@ Run this at the start of every session to know what's pending.
 
 ---
 
-## Step 0 — Verify project isolation (Law 8)
+## Step 0 — Token Budget (before anything else)
+
+Apply these 6 rules for the entire session. They reduce wasted tokens and keep context lean.
+
+```
+PRINCIPLE 1 — REFERENCE OVER COPY
+  Never paste content that exists in a reachable file.
+  CLAUDE.md and MEMORY.md are navigation indexes — not documentation.
+  Say: "Full schema: prisma/schema.prisma" — not the schema itself.
+
+PRINCIPLE 2 — LOAD ON DEMAND
+  Load a file only when the current task explicitly touches it.
+  "I might need this" is not a reason to load.
+
+PRINCIPLE 3 — READ HEADERS BEFORE FULL FILES
+  Memory files have LOAD WHEN: headers.
+  Check the header. If the task doesn't match → skip the file.
+
+PRINCIPLE 4 — WRITE FORWARD, NEVER RE-READ
+  When building or installing CORTEX files: write → verify (head -3) → move on.
+  Never read a file you just wrote to reference it in the next file.
+
+PRINCIPLE 5 — PARTIAL READS FOR LARGE FILES
+  Files > 100 lines: read relevant section first, expand only if needed.
+  TRACKER.md: last 5 entries. STATUS.md: score + blockers only.
+
+PRINCIPLE 6 — SESSION BUDGET AWARENESS
+  Tier 0 (free — already in context): CLAUDE.md · MEMORY.md · gitStatus
+  Tier 1 (cheap — load once per session): STATUS.md · INVARIANT_MEMORY Quick Ref
+  Tier 2 (task-triggered): domain skills · TRANSACTION_MEMORY
+  Tier 3 (ARCH path only): ARCHITECTURE_MEMORY · DEPENDENCY_MEMORY · full diagrams
+```
+
+Full protocol: `core/MASTER-v11.3.md` (TOKEN_BUDGET merged into MASTER)
+
+---
+
+## Step 1 — Verify project isolation (Law 8)
 
 Before doing anything else, confirm this project obeys Law 8.
 
@@ -38,7 +75,7 @@ Proceed regardless — isolation check is a warning, not a session blocker.
 
 ---
 
-## Step 1 — Check if orchestrator is running
+## Step 2 — Check if orchestrator is running
 
 ```bash
 curl -sf http://127.0.0.1:7391/health
@@ -56,7 +93,7 @@ Do NOT block on this — orchestrator is optional enhancement.
 
 ---
 
-## Step 2 — Load status snapshot
+## Step 3 — Load status snapshot
 
 ```bash
 curl -sf http://127.0.0.1:7391/status
@@ -88,7 +125,7 @@ Priority icons: 🔴 1-2 (critical) · 🟡 3-5 (normal) · 🟢 6-9 (low)
 
 ---
 
-## Step 3 — Start a session record
+## Step 4 — Start a session record
 
 ```bash
 curl -sf -X POST http://127.0.0.1:7391/sessions/start \
@@ -104,7 +141,7 @@ SESSION ID: sess_[xxx]  (keep this for /cortex-sync at end)
 
 ---
 
-## Step 4 — Route the user's task
+## Step 5 — Route the user's task
 
 After displaying the brief, ask:
 
