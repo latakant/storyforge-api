@@ -1,4 +1,4 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Job } from 'bullmq';
@@ -66,6 +66,13 @@ export class MailerProcessor extends WorkerHost {
     `;
 
     await this.send({ to: data.authorEmail, subject, html });
+  }
+
+  @OnWorkerEvent('failed')
+  onFailed(job: Job, error: Error): void {
+    this.logger.error(
+      `Mail job ${job.id ?? 'unknown'} (${job.name}) exhausted all ${job.attemptsMade} attempt(s) — retained in failed set. Error: ${error.message}`,
+    );
   }
 
   private async send(opts: { to: string; subject: string; html: string }): Promise<void> {

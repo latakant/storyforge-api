@@ -14,10 +14,14 @@ async function bootstrap(): Promise<void> {
   // Global prefix
   app.setGlobalPrefix('api');
 
-  // CORS
-  const origins = config.get<string>('CORS_ORIGINS', '');
+  // CORS — fail-fast if no origins configured (guards against permissive empty-string split)
+  const rawOrigins = config.get<string>('CORS_ORIGINS', '');
+  const origins = rawOrigins.split(',').map((o) => o.trim()).filter(Boolean);
+  if (origins.length === 0) {
+    throw new Error('CORS_ORIGINS env var is required — set at least one allowed origin');
+  }
   app.enableCors({
-    origin: origins.split(',').map((o) => o.trim()),
+    origin: origins,
     credentials: true,
   });
 

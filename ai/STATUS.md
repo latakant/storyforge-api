@@ -1,18 +1,15 @@
 # StoryForge — Project Status
-> Last updated: 2026-03-15
+> Last updated: 2026-03-31
 
-## Score: 88/100 — ALLOW (threshold: 85)
+## Score: 93/100 — ALLOW (threshold: 85)
 
 ## Decision: ALLOW — all work permitted
 
 ## Open Blockers
 None.
 
-## Open Issues (2 low)
-| ID | Severity | Domain | Title |
-|----|----------|--------|-------|
-| SF-01 | low | queue | BullMQ mailer has no DLQ / retry config |
-| SF-02 | low | security | No explicit CORS origin list in main.ts |
+## Open Issues
+None.
 
 ## E2E Status
 67/67 PASS (2026-03-15) · `node scripts/e2e-test.mjs`
@@ -28,10 +25,12 @@ None.
 | Threaded comments | ✅ Complete |
 | Cover image in write flow | ✅ Complete |
 | CORTEX baseline (score + issues) | ✅ Complete |
+| SF-01: BullMQ DLQ — removeOnFail + failed event handler | ✅ Fixed 2026-03-31 |
+| SF-02: CORS fail-fast validation | ✅ Fixed 2026-03-31 |
 
 ## Next Action
 Pre-launch checklist:
-1. Set `CORS_ORIGINS` env var (SF-02)
-2. Configure BullMQ retry / DLQ (SF-01)
+1. ~~Set `CORS_ORIGINS` env var (SF-02)~~ ✅ fail-fast guard added
+2. ~~Configure BullMQ retry / DLQ (SF-01)~~ ✅ removeOnFail + onFailed handler
 3. `npx prisma migrate deploy` on production DB
 4. Set `NEXT_PUBLIC_API_URL` in web `.env.production`
