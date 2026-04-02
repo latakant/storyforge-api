@@ -192,16 +192,24 @@ describe('AuthService', () => {
       expect(result).toHaveProperty('accessToken');
     });
 
-    it('throws UnauthorizedException if JWT verify fails', async () => {
-      jwtMock.verify.mockImplementation(() => { throw new Error('expired'); });
+    it('throws UnauthorizedException if user is inactive', async () => {
+      prismaMock.refreshToken.findUnique.mockResolvedValue({
+        ...mockRefreshToken,
+        user: { ...mockRefreshToken.user, isActive: false },
+      });
 
-      await expect(service.refresh('bad-token')).rejects.toThrow(UnauthorizedException);
+      await expect(service.refresh('valid-token-inactive-user')).rejects.toThrow(UnauthorizedException);
     });
 
-    it('throws UnauthorizedException if token type is not refresh', async () => {
-      jwtMock.verify.mockReturnValue({ sub: mockUser.id, type: 'access' });
+    it('uses token value as DB lookup key and does not call jwt.verify', async () => {
+      prismaMock.refreshToken.findUnique.mockResolvedValue(mockRefreshToken);
 
-      await expect(service.refresh('access-token-as-refresh')).rejects.toThrow(UnauthorizedException);
+      await service.refresh('opaque-uuid-value');
+
+      expect(prismaMock.refreshToken.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { token: 'opaque-uuid-value' } }),
+      );
+      expect(jwtMock.verify).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException if token not found in DB', async () => {
