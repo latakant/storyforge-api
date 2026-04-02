@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "PP-001",
+    "module": "auth",
+    "root_cause_category": "test-implementation-mismatch",
+    "symptom": "Tests written for JWT-based refresh verification, but implementation uses opaque UUID tokens stored in DB. jwt.verify mock has no effect — service proceeds to DB lookup and returns access token instead of throwing.",
+    "fix_pattern": "When refresh tokens are opaque UUIDs (DB-stored), tests must mock DB state (findUnique) to trigger rejection guards. JWT mock setup is irrelevant — remove it. Ensure inactive user + expired token + not found cases are covered via DB mock.",
+    "occurrences": 1,
+    "confidence": 0.5,
+    "date": "2026-04-02"
+  }
+]
