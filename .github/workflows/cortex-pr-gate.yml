@@ -1,0 +1,162 @@
+# CORTEX PR Gate — v1.0
+# Automated quality gate on every pull request.
+# Installed by: node scripts/install-pr-gate.js
+# Manual install: cp to .github/workflows/cortex-pr-gate.yml
+#
+# v1.0: advisory mode — posts verdict comment, does not block merge.
+# Promote to blocking after 2+ weeks of false-positive monitoring:
+#   → change: continue-on-error: true  to  continue-on-error: false
+#   → or set branch protection rules to require this check.
+
+name: CORTEX PR Gate
+
+on:
+  pull_request:
+    branches: [ master, main, develop ]
+  pull_request_review:
+    types: [ submitted ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  cortex-gate:
+    name: CORTEX Quality Gate
+    runs-on: ubuntu-latest
+    continue-on-error: true   # v1.0 advisory — change to false for blocking mode
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ── CHECK 1: TypeScript ─────────────────────────────────────────────────
+      - name: TypeScript check
+        id: tsc
+        run: |
+          set +e
+          OUTPUT=$(npx tsc --noEmit 2>&1)
+          EXIT=$?
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" | head -20 >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "exit_code=$EXIT" >> $GITHUB_OUTPUT
+          if [ $EXIT -eq 0 ]; then echo "verdict=PASS" >> $GITHUB_OUTPUT; else echo "verdict=FAIL" >> $GITHUB_OUTPUT; fi
+
+      # ── CHECK 2: Tests ───────────────────────────────────────────────────────
+      - name: Test suite
+        id: tests
+        run: |
+          set +e
+          OUTPUT=$(npx jest --passWithNoTests --forceExit --silent 2>&1 | tail -20)
+          EXIT=$?
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "exit_code=$EXIT" >> $GITHUB_OUTPUT
+          if [ $EXIT -eq 0 ]; then echo "verdict=PASS" >> $GITHUB_OUTPUT; else echo "verdict=FAIL" >> $GITHUB_OUTPUT; fi
+        continue-on-error: true
+
+      # ── CHECK 3: Governance score ────────────────────────────────────────────
+      - name: Governance score
+        id: score
+        run: |
+          SCORE_FILE="ai/state/current-score.json"
+          if [ -f "$SCORE_FILE" ]; then
+            SCORE=$(node -e "const s=require('./$SCORE_FILE'); console.log(s.enterpriseScore || s.score || 0)")
+            echo "score=$SCORE" >> $GITHUB_OUTPUT
+            if [ "$SCORE" -ge 95 ]; then echo "verdict=PASS" >> $GITHUB_OUTPUT
+            elif [ "$SCORE" -ge 85 ]; then echo "verdict=WARN" >> $GITHUB_OUTPUT
+            else echo "verdict=FAIL" >> $GITHUB_OUTPUT; fi
+          else
+            echo "score=N/A" >> $GITHUB_OUTPUT
+            echo "verdict=WARN" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      # ── CHECK 4: Secret scan ─────────────────────────────────────────────────
+      - name: Secret scan
+        id: secrets
+        run: |
+          set +e
+          LEAKED=$(grep -r "sk-ant-\|AIza\|AKIA\|rk_live_\|sk_live_" src/ --include="*.ts" -l 2>/dev/null)
+          HARDCODED=$(grep -rE "(apiKey|secret|password)\s*=\s*['\"][^$'\"]{8,}" src/ --include="*.ts" -l 2>/dev/null | grep -v "\.spec\.ts" | grep -v "\.test\.ts")
+          if [ -n "$LEAKED" ] || [ -n "$HARDCODED" ]; then
+            echo "verdict=FAIL" >> $GITHUB_OUTPUT
+            echo "files<<EOF" >> $GITHUB_OUTPUT
+            echo "$LEAKED $HARDCODED" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "verdict=PASS" >> $GITHUB_OUTPUT
+            echo "files=" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      # ── Post verdict comment ─────────────────────────────────────────────────
+      - name: Post PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tsc     = '${{ steps.tsc.outputs.verdict }}';
+            const tests   = '${{ steps.tests.outputs.verdict }}';
+            const score   = '${{ steps.score.outputs.score }}';
+            const scoreV  = '${{ steps.score.outputs.verdict }}';
+            const secrets = '${{ steps.secrets.outputs.verdict }}';
+
+            const icon = v => v === 'PASS' ? '✅' : v === 'WARN' ? '⚠️' : v === 'FAIL' ? '❌' : '⏭';
+            const overall = [tsc, tests, scoreV, secrets].includes('FAIL') ? 'FAIL'
+                          : [tsc, tests, scoreV, secrets].includes('WARN') ? 'WARN' : 'PASS';
+            const overallIcon = overall === 'PASS' ? '✅' : overall === 'WARN' ? '⚠️' : '❌';
+
+            const body = [
+              `## ${overallIcon} CORTEX PR Gate — ${overall}`,
+              '',
+              '| Check | Result |',
+              '|-------|--------|',
+              `| TypeScript (tsc --noEmit) | ${icon(tsc)} ${tsc} |`,
+              `| Test suite (jest) | ${icon(tests)} ${tests} |`,
+              `| Governance score | ${icon(scoreV)} ${scoreV} (${score}/100) |`,
+              `| Secret scan | ${icon(secrets)} ${secrets} |`,
+              '',
+              overall === 'FAIL'
+                ? '> ❌ **One or more checks failed.** Review details above before merging.'
+                : overall === 'WARN'
+                ? '> ⚠️ **Advisory warnings present.** Safe to merge — monitor and address.'
+                : '> ✅ **All checks passed.** Safe to merge.',
+              '',
+              '_CORTEX PR Gate v1.0 (advisory) · [Promote to blocking](https://github.com/latakant/Cortex/blob/master/skills/governance/cortex-pr-gate.yml#L15)_',
+            ].join('\n');
+
+            // Find and update existing comment or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes('CORTEX PR Gate'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
