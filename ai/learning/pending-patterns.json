@@ -1,12 +1,23 @@
-[
-  {
-    "id": "PP-001",
-    "module": "auth",
-    "root_cause_category": "test-implementation-mismatch",
-    "symptom": "Tests written for JWT-based refresh verification, but implementation uses opaque UUID tokens stored in DB. jwt.verify mock has no effect — service proceeds to DB lookup and returns access token instead of throwing.",
-    "fix_pattern": "When refresh tokens are opaque UUIDs (DB-stored), tests must mock DB state (findUnique) to trigger rejection guards. JWT mock setup is irrelevant — remove it. Ensure inactive user + expired token + not found cases are covered via DB mock.",
-    "occurrences": 1,
-    "confidence": 0.5,
-    "date": "2026-04-02"
-  }
-]
+{
+  "_meta": {
+    "created": "2026-04-02",
+    "description": "Patterns captured from cert-bug runs — pending promotion review"
+  },
+  "pending": [
+    {
+      "id": "PP-001",
+      "bug_id": "auth/refresh-unauthorized",
+      "module": "auth",
+      "root_cause_category": "test-implementation-mismatch",
+      "symptom": "Tests written for JWT-based refresh verification, but implementation uses opaque UUID tokens stored in DB. jwt.verify mock has no effect — service proceeds to DB lookup and returns access token instead of throwing.",
+      "fix_pattern": "When refresh tokens are opaque UUIDs (DB-stored), tests must mock DB state (findUnique) to trigger rejection guards. JWT mock setup is irrelevant — remove it. Ensure inactive user + expired token + not found cases are covered via DB mock.",
+      "watchpoints": [
+        "Any auth module using opaque tokens — confirm tests mock DB state not JWT",
+        "refresh() implementations — verify jwt.verify is only called if token IS a JWT"
+      ],
+      "captured": "2026-04-02",
+      "promoted": false,
+      "confidence": 0.5
+    }
+  ]
+}
